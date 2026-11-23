@@ -21,6 +21,11 @@
   "permissions": {
     "allow": [],
     "deny": [
+      "Bash(npx supabase link:*)",
+      "Bash(supabase link:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(supabase db push:*)",
+      "Read(**/.env.production*)",
       "mcp__github__merge_pull_request",
       "mcp__github__create_or_update_file",
       "mcp__github__push_files",

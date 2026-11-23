@@ -48,7 +48,7 @@
 ### A5. Outside the code (start now, they take time)
 1. Fix the website: real phone number and a WhatsApp button (P-01).
 2. Start Meta WhatsApp Business verification (needed later for automation, T3).
-3. Ask Aparna for: current student list (parent, phone, child, course, fee, due date) and open enquiries, in any format.
+3. Ask the Owner for: current student list (parent, phone, child, course, fee, due date) and open enquiries. Real files stay with the Owner: a human imports them in the production UI (M-401). Never upload them to a cloud session or commit them (`*.real.csv` and `imports/` are git-ignored).
 
 ## Part B — How every session runs (works from a phone)
 
