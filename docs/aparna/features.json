@@ -112,7 +112,7 @@
         "start-supabase-e2e copies supabase/tests into .supabase-e2e; the Check e2e job runs npx supabase test db --workdir .supabase-e2e after make test-e2e-ci",
         "a failing test fails the PR"
       ],
-      "verify": "ci:progress.md links a Check run on a throwaway commit where a deliberately failing pgTAP test turned Check red, and the green run after it was reverted",
+      "verify": "manual:progress.md links a Check run on a throwaway commit where a deliberately failing pgTAP test turned Check red, and the green run after it was reverted",
       "passes": false
     },
     {
