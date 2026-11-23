@@ -105,3 +105,27 @@ FINDINGS:
 - Re-review 1 (fresh gate-reviewer at `477102b`): FAIL 78, no blocking. Open high findings: no feature sets `trial_at`, `enrolled_at` or the fee fields; no stage-change timestamp; M1's next-action check breaks upstream `e2e/createContactFromDeal.spec.ts`. Applied only in-scope fixes (DealInputs ownership, M-105 `manual:` verify).
 - Re-review 2 (fresh gate-reviewer at `2eb7c70`): FAIL 60, capped by one security finding; uncapped about 82; no blocking. Open high findings: R-13 timing (Vercel Production plus the first Deploy run open `/sign-up` before the Owner's user exists); no `stage_changed_at`. Medium: no owned mechanism for the M-305 compare-and-set (needs an M1 RPC). Low: M-108 error text, M-001 "A18 Accepted", the `+` verify form, the cap counts accounts not roles, deny-rule bypasses through `cat` or `cd &&`, the project label in `gate-reviewer.md:3`, `*.real.xlsx` not ignored.
 - Gate not passed: ADR-A11..A16 and A18 stay Proposed; M-001 stays `passes: false`. Stopped for Owner decisions as instructed.
+
+### 2026-11-23 — Gate MVP-A: PASS (M0 closed)
+
+- Owner decisions on re-review 2 recorded and applied as ADR-A19 (re-review fixes) and ADR-A20 (light mode, handover) in `a65852a`: sign-ups off from project creation (KICKOFF Part A order), stage trigger (`stage_changed_at`, `enrolled_at`), `next_action_at` default, `mark_fee_paid` (new M-109), stage data entry (new M-206), handover checklist (KICKOFF Part F, new M-504), light mode `_rules` and aparna-loop, low findings applied, deny-rule bypass as R-17.
+- Final cold read (fresh gate-reviewer, MODE gate, "MVP-A final", files + `git diff cf031cf..a65852a`): `VERDICT: PASS`, `SCORE: 85 | Completeness 92 | Traceability 86 | YAGNI 90 | Buildability 84 | Security & privacy 85 | Verification quality 78`. No blocking finding, no open Security & privacy finding.
+- Owner go (given in advance for a pass with no security or blocking finding): ADR-A11..A16, A18, A19 and A20 marked **Accepted**; A17 stays Proposed. M-001 `passes: true` (all five acceptance lines met: baseline and assumptions in the 2026-11-23 M0 entry, gate score >= 80 with no blocking findings, ADRs Accepted, Owner go).
+- Next: M1 (M-101..M-109) in a new session, light mode.
+
+**M1 notes** (remaining findings from the final review; none blocking):
+
+- [medium] pgTAP runs after Playwright on the same `.supabase-e2e` DB: each pgTAP file sets its own baseline inside its transaction (disable or delete fixture `sales`/`deals`) and never assumes an empty DB (M-105, M-108, M-109).
+- [medium] CI runs with `enable_signup = true` (`supabase/config.e2e.toml:84,90`; `e2e/onboarding.spec.ts:14` signs up through the UI), unlike production. Consider adding `config.e2e.toml` to M1 with sign-ups off, so `e2e/signup.spec.ts` proves invitations work with sign-ups off on every Check; replace the UI first-user sign-up with an admin-created first user.
+- [medium] "CI green before merge" is enforced by docs only: protect `main` (PR required, required status check `Check`, no direct pushes) in KICKOFF A1; consider denying `Bash(gh pr merge:*)`. Owner's call.
+- [medium] Every DB-enforced hard rule ships in M1 and is checked only by specs written in the same session: consider one fresh-context check on M1 only (gate-reviewer MODE plan on the M1 plan, or `@claude` on the schema diff). Owner's call.
+- [low] M-109: `mark_fee_paid` must be `SECURITY INVOKER` (anon has EXECUTE on public functions, `06_grants.sql:60`); pgTAP asserts an anon call changes nothing.
+- [low] ADR-A20's "Amends" line should name ADR-A09 (MVP slices) and ADR-A01 (reversal); the `progress.md` header still asks for quoted output (true only for M0 and full-build slices).
+- [low] KICKOFF M0 prompt and go reply (`KICKOFF.md:119,127`) still say "ADR-A11..A16".
+- [low] M-501 acceptance should require the guide line "a disabled Counsellor is replaced only by a new Counsellor; Teachers wait for F-101".
+- [low] KICKOFF Part F: step 2 replaces `SUPABASE_ACCESS_TOKEN` with one from the Owner's organisation; step 6 also checks the Counsellor has `administrator = false`.
+- [low] M-402: the write is row by row, so a mid-file failure leaves a partial import; report the last imported row and make a re-run skip rows already imported (parent phone + child name).
+- [low] aparna-loop: restore one line each for full-build START pointers (`project_plan.md` §3, `TRANSITION.md`) and for CLOSE "a choice with alternatives → ADR (Proposed)".
+- [low] TRANSITION T1/T8: payback steps for `deals.name` = child name and for the `first_response_at`, `stage_changed_at` and `enrolled_at` columns once `students`/`enrolments` exist.
+- [low] M2 and M3 both append to `progress.md`: the second PR to merge rebases it.
+- [low] `CLAUDE-aparna.md` line "MVP slice flow: …" is a procedure in a facts file: replace with "MVP slices M1–M5 run in light mode (ADR-A20); steps in /aparna-loop".

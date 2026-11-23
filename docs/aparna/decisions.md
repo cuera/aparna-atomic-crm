@@ -80,7 +80,7 @@ Status: Proposed · Date: 2026-11-21
 - Reversal condition: the import line is lost in an upstream merge twice → move the import into `.claude/CLAUDE.md`.
 
 ### ADR-A11 — MVP first ("never lose a lead"), full build after a pilot
-Status: Proposed · Date: 2026-11-21
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21
 - Context: The full build is 8–10 weeks at part-time pace. The founder's pain (lost leads, forgotten follow-ups) can be relieved in about 1 week without automation.
 - Options: A) MVP in ~1 week, pilot, then full build chosen by pilot numbers. B) Full build straight away. C) Spreadsheet + WhatsApp labels only.
 - Decision: A. Scope in `MVP.md`; every shortcut and its payback in `TRANSITION.md`.
@@ -88,19 +88,19 @@ Status: Proposed · Date: 2026-11-21
 - Reversal condition: the pilot shows the Counsellor still loses leads with the MVP (M2 > 0 on 3 of 5 days) → stop and fix adoption before any full-build slice.
 
 ### ADR-A12 — MVP stores child and fee data on the admission (temporary)
-Status: Proposed · Date: 2026-11-21 · Temporarily departs from ADR-A03 (students table)
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21 · Temporarily departs from ADR-A03 (students table)
 - Options: A) child + fee columns on `deals`. B) build `students`/`enrolments` now. C) store in notes text.
 - Decision: A. One admission = one child. Payback: `TRANSITION.md` T1, T2.
 - Reversal condition: a family with 2+ children enrols, or the full build starts — whichever comes first.
 
 ### ADR-A13 — MVP sends WhatsApp with one-tap `wa.me` links (temporary)
-Status: Proposed · Date: 2026-11-21 · Defers ADR-A05
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21 · Defers ADR-A05
 - Options: A) `wa.me` prefilled links + logged note. B) Cloud API now. C) A BSP inbox.
 - Decision: A. No Meta verification, templates or message costs in the MVP. Meta business verification starts on MVP day 1 anyway (it can take days to weeks). Payback: `TRANSITION.md` T3.
 - Reversal condition: more than 40 one-tap sends per day during the pilot, or night enquiries waiting more than 8 hours on most days.
 
 ### ADR-A14 — MVP has two staff users and no Teacher accounts (temporary, hard rule)
-Status: Proposed · Date: 2026-11-21 · Defers ADR-A07
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21 · Defers ADR-A07
 - Context: Upstream RLS gives every signed-in user full access. Sign-up is invitation-only after the first user (`handle_new_user`).
 - Decision: only Owner and Counsellor accounts in the MVP. **No Teacher account may be created until F-101 (role RLS) passes.** Sign-ups are off in Supabase Auth from project creation (R-13, ADR-A19).
 - Enforcement (Gate MVP-A, ADR-A18): trigger `sales_mvp_two_staff_cap` refuses a third active `sales` row with an error naming this ADR and F-101 (M-108, pgTAP `mvp_staff_cap.test.sql`); "Allow new users to sign up" is off before any GitHub secret exists, the first account is created from the Supabase dashboard after the first Deploy run, every later account only by in-app invitation (M-107, ADR-A19); SSO / Google Workspace sign-in stays off in production because `handle_new_user` skips the invitation check for SSO users.
@@ -108,7 +108,7 @@ Status: Proposed · Date: 2026-11-21 · Defers ADR-A07
 - Reversal condition: none — this rule is lifted only by F-101 passing.
 
 ### ADR-A15 — Cloud development workflow
-Status: Proposed · Date: 2026-11-21 · Revised 2026-11-21 (P-10)
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21 · Revised 2026-11-21 (P-10)
 - Context: Claude Code cloud sessions include Docker (docker, dockerd, docker compose), 4 vCPUs and 16 GB RAM; the Trusted allowlist covers Docker Hub, ghcr.io and public.ecr.aws. The repo's GitHub Actions `Check` (lint, typecheck, unit, e2e with local Supabase) and `Deploy` (`supabase db push` on main) also run with Docker.
 - Options: A) cloud sessions run the full local stack and follow upstream conventions; CI is the independent second verifier; Vercel Preview (demo mode) for visual checks. B) cloud writes code only, CI runs everything Docker needs, migrations hand-written. C) all work on WSL.
 - Decision: A. Migrations are generated with `npx supabase db diff --local -f <name>` as upstream intends. No production secrets in cloud environments.
@@ -116,7 +116,7 @@ Status: Proposed · Date: 2026-11-21 · Revised 2026-11-21 (P-10)
 - Reversal condition: M0 shows Docker or `make start` does not work in the cloud environment → fall back to option B (hand-written migrations, CI as the only Docker).
 
 ### ADR-A16 — Parallel work = separate cloud sessions with file ownership
-Status: Proposed · Date: 2026-11-21
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-21
 - Decision: after a slice that freezes the schema merges, independent slices run in separate cloud sessions (each its own VM and branch). Each slice owns a list of files (`MVP.md` §7); touching another slice's file means stop and ask. Max 2 parallel sessions (R-5). The upstream `#technical-harness` (worktrees inside one session) is reserved for big full-build slices.
 - Reversal condition: a merge conflict between parallel slices costs more than 30 minutes → run that pair sequentially next time.
 
@@ -129,7 +129,7 @@ Status: Proposed · Date: 2026-11-21
 - Reversal condition: the Owner shows a concrete need that check-ins cannot meet; any move toward B needs a new ADR, written staff consent and a legal check.
 
 ### ADR-A18 — Gate MVP-A amendments
-Status: Proposed · Date: 2026-11-23 · Amends `MVP.md`, `TRANSITION.md`, `features.json` (M- features) under `features.json` `_rules`
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends `MVP.md`, `TRANSITION.md`, `features.json` (M- features) under `features.json` `_rules`
 - Context: the Gate MVP-A cold read failed (score 60, capped; two blocking findings), and M0 found wrong assumptions (`problems.md` P-15..P-21). `_rules` forbid rewording features except through this register.
 - Options: A) amend the M- features and the MVP plan now, before M1 freezes the schema. B) keep the wording and fix it during M1–M4 (agents would build to the old acceptance). C) re-plan the MVP.
 - Decision: A, exactly as the Owner decided on 2026-11-23:
@@ -147,7 +147,7 @@ Status: Proposed · Date: 2026-11-23 · Amends `MVP.md`, `TRANSITION.md`, `featu
 - Reversal condition: a gate re-review or a slice plan review finds an amendment that contradicts an Accepted ADR or makes a feature unverifiable → amend again through a new ADR.
 
 ### ADR-A19 — Gate MVP-A re-review fixes
-Status: Proposed · Date: 2026-11-23 · Amends ADR-A14, ADR-A18, `MVP.md`, `TRANSITION.md`, `KICKOFF.md`, `features.json` (M- features and `_rules`)
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A14, ADR-A18, `MVP.md`, `TRANSITION.md`, `KICKOFF.md`, `features.json` (M- features and `_rules`)
 - Context: two fresh re-reviews of Gate MVP-A after ADR-A18 failed (78; then 60, capped by one security finding). The open findings were the R-13 sign-up window, missing stage and enrolment timestamps, no owned mechanism for the fee compare-and-set, no data entry for trial and fee fields, an M1 change that breaks an upstream e2e spec, `deals.name` without a source, and several low findings.
 - Options: A) fix them in the plan before M1 freezes the schema. B) accept them as known gaps and narrow `MVP.md` §2. C) defer to M1 planning.
 - Decision: A, as the Owner decided on 2026-11-23:
@@ -162,7 +162,7 @@ Status: Proposed · Date: 2026-11-23 · Amends ADR-A14, ADR-A18, `MVP.md`, `TRAN
 - Reversal condition: M1 planning shows one of these cannot be built inside the fork's conventions → amend through a new ADR before the M1 PR.
 
 ### ADR-A20 — Light mode and handover
-Status: Proposed · Date: 2026-11-23 · Amends ADR-A17, `features.json` `_rules` and F-1105, the aparna-loop skill, `KICKOFF.md`
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A17, `features.json` `_rules` and F-1105, the aparna-loop skill, `KICKOFF.md`
 - Context: the MVP is small and its rules are now enforced by the database, CI and permissions. Per-slice gate reviews and pasted evidence cost more than they catch from M1 on. The production accounts also need a clear owner.
 - Options: A) light mode from M1 plus a handover checklist. B) keep the full per-slice evidence loop. C) build in the Owner's accounts from day one.
 - Decision: A.
@@ -174,4 +174,4 @@ Status: Proposed · Date: 2026-11-23 · Amends ADR-A17, `features.json` `_rules`
 
 ## Provenance & audit
 Sources: chat analysis 20–21 Nov 2026, upstream repo inspection, Meta and Razorpay docs.
-Checked: each ADR has options, decision, consequences and an observable reversal condition; ADR IDs referenced in PRD/ARCHITECTURE exist here (A03, A07); none marked Accepted before Gate A.
+Checked: each ADR has options, decision, consequences and an observable reversal condition; ADR IDs referenced in PRD/ARCHITECTURE exist here (A03, A07); A01–A10 stay Proposed until Gate A; A11–A16 and A18–A20 Accepted at Gate MVP-A (2026-11-23, gate-reviewer PASS 85); A17 stays Proposed.

@@ -52,7 +52,7 @@
         "Owner go recorded"
       ],
       "verify": "manual:Gate MVP-A entry in progress.md",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-101",
