@@ -97,3 +97,11 @@ FINDINGS:
 
 - Not changed (per M0 rules): `MVP.md`, `TRANSITION.md`, `decisions.md`, `features.json`, `CLAUDE-aparna.md`.
 - Next: the Owner reviews the proposed fixes (P-12..P-21 + the findings above) and replies "Gate MVP-A: go" with the approved list. Then this session applies them, re-runs the gate, and marks ADR-A11..A16 Accepted. M-001 stays `passes: false` until then.
+
+### 2026-11-23 — M0 Gate MVP-A amendments and re-reviews (cloud session, no product code)
+
+- Applied the Owner's Gate MVP-A decisions as ADR-A18 (commits `477102b`, `2eb7c70`): M-305 compare-and-set, Owner referred to by role, `MVP.md` §3/§4/§5/§6/§7/§8/§9, TRANSITION T5/T10/T11/T13, new M-108 (two-staff cap) and M-403 (Today quick-add), M-401/M-402 rewritten, one spec per feature, `.gitignore` real-file lines, deny rules, P-12..P-14 encoded.
+- Deny rules proven: `npx supabase link …`, `supabase link …`, `npx supabase db push --dry-run`, `supabase db push --dry-run` → "Permission to use Bash with command … has been denied."; Read `.env.production` and `supabase/.env.production.local` → "File is in a directory that is denied by your permission settings." Hook tests: `vitest --project claude` settings tests 2 files, 36 passed.
+- Re-review 1 (fresh gate-reviewer at `477102b`): FAIL 78, no blocking. Open high findings: no feature sets `trial_at`, `enrolled_at` or the fee fields; no stage-change timestamp; M1's next-action check breaks upstream `e2e/createContactFromDeal.spec.ts`. Applied only in-scope fixes (DealInputs ownership, M-105 `manual:` verify).
+- Re-review 2 (fresh gate-reviewer at `2eb7c70`): FAIL 60, capped by one security finding; uncapped about 82; no blocking. Open high findings: R-13 timing (Vercel Production plus the first Deploy run open `/sign-up` before the Owner's user exists); no `stage_changed_at`. Medium: no owned mechanism for the M-305 compare-and-set (needs an M1 RPC). Low: M-108 error text, M-001 "A18 Accepted", the `+` verify form, the cap counts accounts not roles, deny-rule bypasses through `cat` or `cd &&`, the project label in `gate-reviewer.md:3`, `*.real.xlsx` not ignored.
+- Gate not passed: ADR-A11..A16 and A18 stay Proposed; M-001 stays `passes: false`. Stopped for Owner decisions as instructed.
