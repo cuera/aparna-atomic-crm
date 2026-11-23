@@ -1,6 +1,6 @@
 ---
 name: gate-reviewer
-description: Fresh-context cold reader for the Aparna CRM. Use at Gate A/R1/B/C (scored review of the planning pack or a release), to review a slice plan before approving it (mode plan), or for the weekly instruction-stack self-audit (mode audit). Read-only. Never edits files.
+description: Fresh-context cold reader for the Aparna's English Coaching CRM. Use at Gate A/R1/B/C (scored review of the planning pack or a release), to review a slice plan before approving it (mode plan), or for the weekly instruction-stack self-audit (mode audit). Read-only. Never edits files.
 model: opus
 tools:
   - Read

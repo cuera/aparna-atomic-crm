@@ -102,8 +102,9 @@ Status: Proposed · Date: 2026-11-21 · Defers ADR-A05
 ### ADR-A14 — MVP has two staff users and no Teacher accounts (temporary, hard rule)
 Status: Proposed · Date: 2026-11-21 · Defers ADR-A07
 - Context: Upstream RLS gives every signed-in user full access. Sign-up is invitation-only after the first user (`handle_new_user`).
-- Decision: only Owner and Counsellor accounts in the MVP. **No Teacher account may be created until F-101 (role RLS) passes.** The Owner signs up first on any fresh production project (R-13).
-- Enforcement (Gate MVP-A, ADR-A18): trigger `sales_mvp_two_staff_cap` refuses a third active `sales` row with an error naming this ADR and F-101 (M-108, pgTAP `mvp_staff_cap.test.sql`); the Owner's user is created from the Supabase dashboard before the production URL is opened or shared (M-107); SSO / Google Workspace sign-in stays off in production because `handle_new_user` skips the invitation check for SSO users.
+- Decision: only Owner and Counsellor accounts in the MVP. **No Teacher account may be created until F-101 (role RLS) passes.** Sign-ups are off in Supabase Auth from project creation (R-13, ADR-A19).
+- Enforcement (Gate MVP-A, ADR-A18): trigger `sales_mvp_two_staff_cap` refuses a third active `sales` row with an error naming this ADR and F-101 (M-108, pgTAP `mvp_staff_cap.test.sql`); "Allow new users to sign up" is off before any GitHub secret exists, the first account is created from the Supabase dashboard after the first Deploy run, every later account only by in-app invitation (M-107, ADR-A19); SSO / Google Workspace sign-in stays off in production because `handle_new_user` skips the invitation check for SSO users.
+- Consequences: the cap counts active accounts, not roles (there is no role column before F-101). Disabling the Counsellor and inviting a Teacher would pass the trigger. This residual risk is accepted: only the administrator can do it, and the rule is that a disabled Counsellor is replaced only by a new Counsellor (Counsellor guide, M-501).
 - Reversal condition: none — this rule is lifted only by F-101 passing.
 
 ### ADR-A15 — Cloud development workflow
@@ -124,7 +125,7 @@ Status: Proposed · Date: 2026-11-21
 - Context: the Owner asked for field activity tracking of staff. Location data about employees is personal data (DPDP 2023: notice and consent) and can be misused by anyone who can read it.
 - Options: A) check-in/check-out snapshots with consent, Owner-only RLS, 90-day coordinate retention. B) continuous background tracking (needs a native app and store approval for background location; far more intrusive). C) no location, visit log only.
 - Decision: A, with C as the automatic fallback for staff who do not consent.
-- Consequences: needs role RLS first (after T5/F-101); production Supabase project and its keys owned by the Owner's account, not by Intrigues; developers work on staging and demo data only.
+- Consequences: needs role RLS first (after T5/F-101); production Supabase project and its keys owned by the Owner's account from handover (M-504, ADR-A20) onward, not by Intrigues; developers work on staging and demo data only.
 - Reversal condition: the Owner shows a concrete need that check-ins cannot meet; any move toward B needs a new ADR, written staff consent and a legal check.
 
 ### ADR-A18 — Gate MVP-A amendments
@@ -137,13 +138,39 @@ Status: Proposed · Date: 2026-11-23 · Amends `MVP.md`, `TRANSITION.md`, `featu
   3. Ownership (`MVP.md` §7): M1 = labels, menu, company not required, default stage `enquiry`, Settings stages read-only, CI pgTAP step, deploy jobs, exporters; M2 = phone helper, quick-add (board header only), next action + lost reason, card; M3 = `today/`, `whatsapp/`, time helper, Admission detail buttons, Parent opt-in switch; M4 = `dataImport/` + the Today quick-add button (new M-403).
   4. DB check `deals_open_needs_next_action` = `stage not in ('enrolled','lost')` ⇒ `next_action_at is not null`; stages read-only in Settings during the MVP.
   5. Deploy: `deploy-doc`, `deploy-demo` and the GitHub Pages steps removed (Vercel replaces them); migration push kept; SSO off in production.
-  6. ADR-A14 enforced by a trigger and pgTAP (new M-108); R-13 enforced by creating the Owner's user from the Supabase dashboard before the URL is shared (M-107).
+  6. ADR-A14 enforced by a trigger and pgTAP (new M-108); R-13 enforced by creating the Owner's user from the Supabase dashboard before the URL is shared (M-107) — superseded by ADR-A19 item 1.
   7. One admissions importer with a `stage` column (M-401 reworded, title "Import admissions") and an all-or-nothing validation pass that lists row errors (M-402 reworded, title "Import validation pass (dry run)"); synthetic CSVs only; `*.real.csv` and `imports/` git-ignored.
   8. M-304 honours `whatsapp_opt_in` and the Parent form can switch it off (TRANSITION T13, closes with F-105); `progress_update` template added (M-303: 9 templates, per-template follow-up defaults in `MVP.md` §6); problem 7 reworded to "grade + notes"; M-103 adds CSV export of new fields; M-202 sets the parent time zone from the country guess (US and UK tests).
   9. Every M- verify names its own spec file (M-101, M-102, M-106, M-202, M-203, M-204, M-205, M-301, M-303, M-304, M-305, M-306, M-401, M-402, M-403). M-103 is the only feature that names two specs (one pgTAP for the schema, one vitest for the export), and no spec is shared between features. M-105's verify (`manual:` shape, since it is a link recorded in `progress.md`) cites a Check run where a deliberately failing pgTAP test turned red. `deals/DealInputs.tsx`: M1 edits only the company and default-stage lines; M2 owns the rest of the file after M1 merges. M-503 and `MVP.md` §9 add the `supabase db diff` drift check. M-001 names ADR-A11..A16 and adds "ADR-A11..A16 marked Accepted".
   10. `.claude/settings.json` denies `supabase link`, `supabase db push` and reading `.env.production*`.
 - Consequences: two new feature ids (M-108 in M1, M-403 in M4); M4 now waits for M2 and M3; no `passes` changed. The P-16 dashboard charts (`dashboard/DealsChart.tsx`, which hard-codes `won`) are not in scope: Today replaces the dashboard as the landing page (M-301).
 - Reversal condition: a gate re-review or a slice plan review finds an amendment that contradicts an Accepted ADR or makes a feature unverifiable → amend again through a new ADR.
+
+### ADR-A19 — Gate MVP-A re-review fixes
+Status: Proposed · Date: 2026-11-23 · Amends ADR-A14, ADR-A18, `MVP.md`, `TRANSITION.md`, `KICKOFF.md`, `features.json` (M- features and `_rules`)
+- Context: two fresh re-reviews of Gate MVP-A after ADR-A18 failed (78; then 60, capped by one security finding). The open findings were the R-13 sign-up window, missing stage and enrolment timestamps, no owned mechanism for the fee compare-and-set, no data entry for trial and fee fields, an M1 change that breaks an upstream e2e spec, `deals.name` without a source, and several low findings.
+- Options: A) fix them in the plan before M1 freezes the schema. B) accept them as known gaps and narrow `MVP.md` §2. C) defer to M1 planning.
+- Decision: A, as the Owner decided on 2026-11-23:
+  1. R-13: "Allow new users to sign up" is OFF in Supabase Auth from project creation, permanently. Setup order (KICKOFF.md Part A): create project → sign-ups off → custom SMTP (Resend or Brevo) → only then add GitHub secrets → first Deploy pushes the schema → the developer creates the first test account (owner email alias) from the Supabase dashboard (the trigger makes it administrator) → the second test account (counsellor email alias) only by in-app invitation. M-107 checks the order, proves an invitation works with sign-ups off on the local stack, and records administrator = true only for the first account.
+  2. `deals.stage_changed_at` is set by a trigger on insert and on every stage change; the same trigger sets `enrolled_at` when the stage becomes `enrolled` (M1, M-103, pgTAP).
+  3. M1 database function `mark_fee_paid(deal_id, shown_due)`: one `UPDATE … WHERE next_fee_due = shown_due` plus the note insert in the same transaction; returns whether it applied; pgTAP double call = one advance, one note (new M-109). M3 calls it through a custom dataProvider method `markFeePaid` with a FakeRest equivalent (M-305).
+  4. M2 owns stage data entry (new M-206): moving to `trial_booked` asks for `trial_at`; moving to `enrolled` asks for fee amount, period and next due date (`enrolled_at` from the trigger); the edit form shows child and fee fields. The M4 importer gets a `trial_at` column.
+  5. M1 fixes any upstream e2e spec it breaks. `next_action_at` gets a PERMANENT DB default of `now() + interval '1 day'`; the check still blocks clearing it on open stages. Every open admission always has a next action (default tomorrow, editable); M-203 reworded.
+  6. `deals.name` = child name, set automatically by forms and the importer; the name field is hidden.
+  7. All low findings applied: the M-108 error names ADR-A14; M-001 lists A18, A19 and A20; `_rules` defines ` + ` in a verify; ADR-A14 records that the cap counts accounts, not roles; the gate-reviewer label uses the trade name; `.gitignore` covers `*.real.*`; Today replaces both dashboards and M1 relabels the dashboard tab. Exception: the deny-rule bypass (`cat`, `cd … &&`) is recorded in `risks.md` (R-17) as a known limit, with no extra rules.
+- Consequences: two new features (M-109 in M1, M-206 in M2); M1 adds two triggers, one column, one default and one function before the schema freeze.
+- Reversal condition: M1 planning shows one of these cannot be built inside the fork's conventions → amend through a new ADR before the M1 PR.
+
+### ADR-A20 — Light mode and handover
+Status: Proposed · Date: 2026-11-23 · Amends ADR-A17, `features.json` `_rules` and F-1105, the aparna-loop skill, `KICKOFF.md`
+- Context: the MVP is small and its rules are now enforced by the database, CI and permissions. Per-slice gate reviews and pasted evidence cost more than they catch from M1 on. The production accounts also need a clear owner.
+- Options: A) light mode from M1 plus a handover checklist. B) keep the full per-slice evidence loop. C) build in the Owner's accounts from day one.
+- Decision: A.
+  1. Build and test phase: Supabase and Vercel live in the developer's account; test accounts use developer email aliases; synthetic data only. Handover checklist in `KICKOFF.md` Part F (new M-504 in M5, manual verify): transfer Supabase and Vercel to the Owner's accounts → rotate Supabase secret keys and update the GitHub and Vercel secrets → disable the test counsellor account → the test owner account invites the Owner as administrator → the Owner disables the test owner account and invites the Counsellor, who sets her own password → real data import starts. (The test counsellor account is disabled first because the M-108 cap refuses a third active account, and an invitation is the only way in once sign-ups are off and a first user exists.) F-1105 and ADR-A17: production is in the Owner's account from handover onward.
+  2. From M1 on, per slice: plan → the human's go → build → PR → CI `Check` green → the human checks the Vercel Preview → the human merges. No gate-reviewer on slice plans, no per-feature evidence pasting; features flip `passes` when the PR's `Check` is green and runs their verify (`_rules`); `progress.md` gets one line per slice; `/aparna-loop` START and CLOSE are shortened to match.
+  3. Hard rules kept: sign-ups off; synthetic data until handover; `mark_fee_paid` compare-and-set; CI green before merge.
+- Consequences: faster slices; the Check run and the Preview are the evidence; full-build slices keep the process in `project_plan.md`.
+- Reversal condition: if M1 spends more than one day fighting fork conventions, stop and propose a fresh Next.js + Supabase rebuild that uses `MVP.md` as the spec.
 
 ## Provenance & audit
 Sources: chat analysis 20–21 Nov 2026, upstream repo inspection, Meta and Razorpay docs.

@@ -60,5 +60,5 @@ node_modules/
 *.lock
  
 # Real import files (never commit: children's data, see docs/aparna/MVP.md section 3)
-*.real.csv
+*.real.*
 imports/

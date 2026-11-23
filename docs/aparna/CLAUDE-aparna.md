@@ -22,7 +22,8 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 
 ## Rules that are easy to miss
 
-- Only `passes` may change in `docs/aparna/features.json`, and only with pasted green `verify` output (`ci:` = green Check run on the PR).
+- Only `passes` may change in `docs/aparna/features.json`. MVP slices from M1 (light mode, ADR-A20): it flips when the slice PR's `Check` is green; `manual:` features only on the human's confirmation.
+- MVP slice flow: plan → human go → build → PR → `Check` green → human checks the Vercel Preview → human merges. One line per slice in `progress.md`.
 - MVP: **no Teacher accounts** until F-101 passes (ADR-A14). Only Owner and Counsellor; a `sales` trigger caps active staff at 2 (M-108); SSO stays off.
 - MVP: the next-action DB check is a closed list (`stage not in ('enrolled','lost')`), so stages are read-only in Settings (a saved DB config overrides defaults per key, P-15).
 - Real student or enquiry files never enter a cloud session or git; importers are tested with synthetic CSVs only.
@@ -42,7 +43,8 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 - Upstream RLS is `using (true)`; any table we touch in the full build gets role policies (ADR-A07).
 - `demo/App.tsx` does not use `src/App.tsx`; domain options go in `root/defaultConfiguration.ts` (P-11).
 - Planning chat sandboxes are not Claude Code cloud sessions: check facts about the cloud VM in code.claude.com docs or in the session itself (P-10).
-- First sign-up on a fresh Supabase project becomes the administrator (R-13).
+- First user on a fresh Supabase project becomes the administrator (R-13): sign-ups are OFF in Supabase Auth from project creation; first account from the dashboard after the first Deploy, all others by invitation (ADR-A19).
+- Until handover (M-504): Supabase and Vercel in the developer's account, test accounts on developer email aliases, synthetic data only (ADR-A20).
 
 ## Mistakes Log
 
