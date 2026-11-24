@@ -52,7 +52,7 @@ test("user adds a tag to several contacts", async ({
   await page.getByLabel("Tag name").fill("Prospect");
   await page.getByRole("button", { name: "Save" }).click();
 
-  await dismissToast("Tag added to 2 contacts");
+  await dismissToast("Tag added to 2 parents");
 
   await expect(
     page.getByText("Grace Hopper").locator("xpath=ancestor::a[1]"),
