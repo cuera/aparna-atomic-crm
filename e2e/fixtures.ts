@@ -200,11 +200,11 @@ async function createContact({
 // so they are announced as links on every viewport.
 const getMenuMethod = ({ page }: { page: Page }) => ({
   goToDashboard: async () => {
-    await page.getByRole("link", { name: "Dashboard" }).click();
+    await page.getByRole("link", { name: "Today" }).click();
     await page.waitForLoadState("networkidle");
   },
   goToContacts: async () => {
-    await page.getByRole("link", { name: "Contacts" }).click();
+    await page.getByRole("link", { name: "Parents" }).click();
     await page.waitForLoadState("networkidle");
   },
 });

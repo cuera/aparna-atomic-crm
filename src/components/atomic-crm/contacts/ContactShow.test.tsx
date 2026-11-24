@@ -209,7 +209,7 @@ describe("ContactShow", () => {
     );
 
     await expect
-      .element(screen.getByText("Error loading contact"))
+      .element(screen.getByText("Error loading parent"))
       .toBeVisible();
   });
 
@@ -250,7 +250,7 @@ describe("ContactShow", () => {
     await refetchQueries!();
 
     await expect
-      .element(screen.getByText("Error loading contact"))
+      .element(screen.getByText("Error loading parent"))
       .not.toBeInTheDocument();
     await expect
       .element(screen.getByRole("tab", { name: "0 tasks" }))

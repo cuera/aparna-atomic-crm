@@ -35,10 +35,10 @@ test.describe("user creating a contact from the deal form", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveTitle(/Atomic CRM/);
 
-    await page.getByRole("link", { name: "Deals" }).click();
+    await page.getByRole("link", { name: "Admissions" }).click();
     await page.waitForLoadState("networkidle");
 
-    await page.getByRole("link", { name: "Create deal" }).click();
+    await page.getByRole("link", { name: "Create admission" }).click();
 
     // "Linked to" keeps this scoped to the deal form once the contact sheet opens
     const dealForm = page.getByRole("dialog").filter({ hasText: "Linked to" });
@@ -58,7 +58,7 @@ test.describe("user creating a contact from the deal form", () => {
     await page.getByRole("option", { name: "Create Grace Hopper" }).click();
 
     // the creation form opens, prefilled from what was typed and from the deal
-    const contactSheet = page.getByRole("dialog", { name: "New Contact" });
+    const contactSheet = page.getByRole("dialog", { name: "New Parent" });
     await expect(contactSheet.getByLabel("First name")).toHaveValue("Grace");
     await expect(contactSheet.getByLabel("Last name")).toHaveValue("Hopper");
     await expect(

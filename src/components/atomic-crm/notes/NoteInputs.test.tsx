@@ -70,7 +70,7 @@ describe("NoteInputs", () => {
     );
 
     await expect
-      .element(screen.getByRole("combobox", { name: "Contact" }))
+      .element(screen.getByRole("combobox", { name: "Parent" }))
       .toBeVisible();
   });
 
@@ -80,7 +80,7 @@ describe("NoteInputs", () => {
     );
 
     await expect
-      .element(screen.getByRole("combobox", { name: "Deal" }))
+      .element(screen.getByRole("combobox", { name: "Admission" }))
       .toBeVisible();
   });
 
@@ -88,10 +88,10 @@ describe("NoteInputs", () => {
     const screen = await render(<Default />);
 
     await expect
-      .element(screen.getByRole("combobox", { name: "Contact" }))
+      .element(screen.getByRole("combobox", { name: "Parent" }))
       .not.toBeInTheDocument();
     await expect
-      .element(screen.getByRole("combobox", { name: "Deal" }))
+      .element(screen.getByRole("combobox", { name: "Admission" }))
       .not.toBeInTheDocument();
   });
 

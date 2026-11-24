@@ -28,6 +28,16 @@ create or replace trigger set_task_sales_id_trigger
     before insert on public.tasks
     for each row execute function public.set_sales_id_default();
 
+-- MVP admission fields: name follows child_name; stage_changed_at and enrolled_at follow the stage
+create or replace trigger deals_mvp_fields
+    before insert or update on public.deals
+    for each row execute function public.handle_deal_mvp_fields();
+
+-- MVP two-staff cap (ADR-A14, M-108); dropped only by the F-101 slice (TRANSITION T5)
+create or replace trigger sales_mvp_two_staff_cap
+    before insert or update of disabled on public.sales
+    for each row execute function public.enforce_mvp_two_staff_cap();
+
 -- Auto-fetch company logo from website favicon on save
 create or replace trigger company_saved
     before insert or update on public.companies

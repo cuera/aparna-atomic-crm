@@ -8,9 +8,9 @@ import lightModeLogo from "./logos/logo_atomic_crm_light.svg";
 export const defaultDarkModeLogo = darkModeLogo;
 export const defaultLightModeLogo = lightModeLogo;
 
-export const defaultCurrency = "USD";
+export const defaultCurrency = "INR";
 
-export const defaultTitle = "Atomic CRM";
+export const defaultTitle = "Aparna's English Coaching";
 
 export const defaultCompanySectors = [
   { value: "communication-services", label: "Communication Services" },
@@ -26,16 +26,18 @@ export const defaultCompanySectors = [
   { value: "utilities", label: "Utilities" },
 ];
 
+// MVP admission stages (MVP.md section 4). The database check deals_open_needs_next_action
+// hard-codes enrolled and lost as the closed stages, so the Settings page shows these read-only.
 export const defaultDealStages = [
-  { value: "opportunity", label: "Opportunity" },
-  { value: "proposal-sent", label: "Proposal Sent" },
-  { value: "in-negociation", label: "In Negotiation" },
-  { value: "won", label: "Won" },
+  { value: "enquiry", label: "Enquiry" },
+  { value: "trial_booked", label: "Trial booked" },
+  { value: "trial_done", label: "Trial done" },
+  { value: "payment_pending", label: "Payment pending" },
+  { value: "enrolled", label: "Enrolled" },
   { value: "lost", label: "Lost" },
-  { value: "delayed", label: "Delayed" },
 ];
 
-export const defaultDealPipelineStatuses = ["won"];
+export const defaultDealPipelineStatuses = ["enrolled"];
 
 export const defaultDealCategories = [
   { value: "other", label: "Other" },
@@ -52,19 +54,55 @@ export const defaultNoteStatuses = [
   { value: "in-contract", label: "In Contract", color: "#a4e87d" },
 ];
 
+// "none" stays first: the task forms default to it
 export const defaultTaskTypes = [
   { value: "none", label: "None" },
-  { value: "email", label: "Email" },
-  { value: "demo", label: "Demo" },
-  { value: "lunch", label: "Lunch" },
-  { value: "meeting", label: "Meeting" },
-  { value: "follow-up", label: "Follow-up" },
-  { value: "thank-you", label: "Thank you" },
-  { value: "ship", label: "Ship" },
   { value: "call", label: "Call" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "trial", label: "Trial" },
+  { value: "fee", label: "Fee" },
+  { value: "other", label: "Other" },
 ];
 
-export const defaultConfiguration: ConfigurationContextValue = {
+// Placeholder list; the Owner edits it on the Settings page
+export const defaultCourses = [
+  { value: "spoken-english", label: "Spoken English" },
+  { value: "grammar", label: "Grammar (IV-XII)" },
+  { value: "creative-writing", label: "Creative Writing" },
+  { value: "board-exam-prep", label: "Board Exam Prep" },
+  { value: "other", label: "Other" },
+];
+
+export const defaultBoards = [
+  { value: "cbse", label: "CBSE" },
+  { value: "icse", label: "ICSE" },
+  { value: "isc", label: "ISC" },
+  { value: "igcse", label: "IGCSE" },
+  { value: "state", label: "State" },
+  { value: "other", label: "Other" },
+];
+
+export const defaultSources = [
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "call", label: "Call" },
+  { value: "website", label: "Website" },
+  { value: "instagram", label: "Instagram" },
+  { value: "referral", label: "Referral" },
+  { value: "other", label: "Other" },
+];
+
+export const defaultLostReasons = [
+  { value: "no-response", label: "No response" },
+  { value: "price", label: "Price" },
+  { value: "timing", label: "Timing" },
+  { value: "chose-competitor", label: "Chose competitor" },
+  { value: "level-mismatch", label: "Level mismatch" },
+  { value: "not-interested", label: "Not interested" },
+  { value: "duplicate", label: "Duplicate" },
+  { value: "other", label: "Other" },
+];
+
+export const defaultConfiguration: Required<ConfigurationContextValue> = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
   dealCategories: defaultDealCategories,
@@ -75,4 +113,8 @@ export const defaultConfiguration: ConfigurationContextValue = {
   title: defaultTitle,
   darkModeLogo: defaultDarkModeLogo,
   lightModeLogo: defaultLightModeLogo,
+  courses: defaultCourses,
+  boards: defaultBoards,
+  sources: defaultSources,
+  lostReasons: defaultLostReasons,
 };

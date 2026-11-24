@@ -120,6 +120,9 @@ jobs:
         run: npm install -g wait-on serve
       - name: Run Playwright tests
         run: make test-e2e-ci
+      # pgTAP on the same e2e database, after Playwright (M-105); each test file sets its own baseline.
+      - name: Run pgTAP database tests
+        run: npx supabase test db --workdir .supabase-e2e
 
     build:
         name: 🔨 Build
@@ -146,7 +149,7 @@ jobs:
             - name: 🔨 Build
               run: npm run build
 
-            # deploy.yml ships these builds once this workflow passed on main.
+            # The e2e job tests app-dist; Vercel builds the deployed app itself (M-107).
             - name: 📤 Upload app build
               uses: actions/upload-artifact@v7
               with:

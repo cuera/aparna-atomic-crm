@@ -49,7 +49,12 @@ create table public.contacts (
     sales_id bigint,
     linkedin_url text,
     email_jsonb jsonb,
-    phone_jsonb jsonb
+    phone_jsonb jsonb,
+    country text,
+    timezone text default 'Asia/Kolkata'::text,
+    phone_e164 text,
+    whatsapp_opt_in boolean not null default true,
+    constraint contacts_phone_e164_format check (phone_e164 ~ '^\+[1-9][0-9]{6,14}$')
 );
 
 create table public.contact_notes (
@@ -77,8 +82,27 @@ create table public.deals (
     expected_closing_date date,
     sales_id bigint,
     index smallint,
+    child_name text,
+    child_grade text,
+    board text,
+    course text,
+    source text,
+    next_action_at timestamp with time zone default (now() + '1 day'::interval),
+    lost_reason text,
+    trial_at timestamp with time zone,
+    first_response_at timestamp with time zone,
+    enrolled_at timestamp with time zone,
+    stage_changed_at timestamp with time zone,
+    fee_amount_paise bigint,
+    fee_period text,
+    next_fee_due date,
     -- Rejects implausible dates, e.g. typos such as 5-digit years, plus BC dates and infinity, which the UI cannot display
-    constraint deals_expected_closing_date_range check (expected_closing_date between '1900-01-01' and '2900-12-31')
+    constraint deals_expected_closing_date_range check (expected_closing_date between '1900-01-01' and '2900-12-31'),
+    -- MVP (M-104): a closed list of closed stages, so an unknown stage (e.g. upstream 'opportunity') still needs a next action
+    constraint deals_open_needs_next_action check (stage in ('enrolled', 'lost') or next_action_at is not null),
+    constraint deals_lost_needs_reason check (stage <> 'lost' or nullif(btrim(lost_reason), '') is not null),
+    constraint deals_fee_period_values check (fee_period in ('monthly', 'quarterly')),
+    constraint deals_fee_amount_paise_non_negative check (fee_amount_paise >= 0)
 );
 
 create table public.deal_notes (
@@ -188,5 +212,6 @@ alter table only public.deal_notes
 
 create index contact_notes_contact_id_idx on public.contact_notes using btree (contact_id);
 create index contacts_company_id_idx on public.contacts using btree (company_id);
+create unique index contacts_phone_e164_key on public.contacts using btree (phone_e164) where (phone_e164 is not null);
 create index deal_notes_deal_id_idx on public.deal_notes using btree (deal_id);
 create index deals_company_id_idx on public.deals using btree (company_id);

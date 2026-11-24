@@ -31,7 +31,7 @@ describe("DashboardStepper", () => {
     // A plain link, as CreateButton renders one: an anchor given role="button"
     // is announced as a button but does not answer to Space
     await expect
-      .element(screen.getByRole("link", { name: "Add contact" }))
+      .element(screen.getByRole("link", { name: "Add parent" }))
       .toHaveAttribute("href", "/contacts/create");
   });
 
@@ -53,10 +53,10 @@ describe("DashboardStepper", () => {
     mockIsMobile.mockReturnValue(true);
     const screen = await render(<FirstStep />);
 
-    await screen.getByRole("button", { name: "Add contact" }).click();
+    await screen.getByRole("button", { name: "Add parent" }).click();
 
     await expect
-      .element(screen.getByRole("heading", { name: "New Contact" }))
+      .element(screen.getByRole("heading", { name: "New Parent" }))
       .toBeVisible();
   });
 });

@@ -59,7 +59,7 @@ describe("DealInputs", () => {
 
     // the hint is shown instead, and cannot be selected
     const hint = screen.getByRole("option", {
-      name: /Start typing to create a new contact/,
+      name: /Start typing to create a new parent/,
     });
     await expect.element(hint).toHaveAttribute("aria-disabled", "true");
   });

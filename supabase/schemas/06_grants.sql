@@ -14,6 +14,10 @@ grant all on function public.cleanup_note_attachments() to anon;
 grant all on function public.cleanup_note_attachments() to authenticated;
 grant all on function public.cleanup_note_attachments() to service_role;
 
+grant all on function public.enforce_mvp_two_staff_cap() to anon;
+grant all on function public.enforce_mvp_two_staff_cap() to authenticated;
+grant all on function public.enforce_mvp_two_staff_cap() to service_role;
+
 grant all on function public.get_avatar_for_email(text) to anon;
 grant all on function public.get_avatar_for_email(text) to authenticated;
 grant all on function public.get_avatar_for_email(text) to service_role;
@@ -41,6 +45,10 @@ grant all on function public.handle_contact_saved() to anon;
 grant all on function public.handle_contact_saved() to authenticated;
 grant all on function public.handle_contact_saved() to service_role;
 
+grant all on function public.handle_deal_mvp_fields() to anon;
+grant all on function public.handle_deal_mvp_fields() to authenticated;
+grant all on function public.handle_deal_mvp_fields() to service_role;
+
 grant all on function public.handle_new_user() to anon;
 grant all on function public.handle_new_user() to authenticated;
 grant all on function public.handle_new_user() to service_role;
@@ -57,7 +65,14 @@ grant all on function public.lowercase_email_jsonb() to anon;
 grant all on function public.lowercase_email_jsonb() to authenticated;
 grant all on function public.lowercase_email_jsonb() to service_role;
 
-grant all on function public.merge_contacts(bigint, bigint) to anon;
+-- MVP: signed-in staff only; anon must never run these (M-109)
+revoke all on function public.mark_fee_paid(bigint, date) from public;
+revoke all on function public.mark_fee_paid(bigint, date) from anon;
+grant execute on function public.mark_fee_paid(bigint, date) to authenticated;
+grant execute on function public.mark_fee_paid(bigint, date) to service_role;
+
+revoke all on function public.merge_contacts(bigint, bigint) from public;
+revoke all on function public.merge_contacts(bigint, bigint) from anon;
 grant all on function public.merge_contacts(bigint, bigint) to authenticated;
 grant all on function public.merge_contacts(bigint, bigint) to service_role;
 

@@ -1,6 +1,11 @@
 import type { CrmMessages } from "./englishCrmMessages";
 
 export const frenchCrmMessages = {
+  ra: {
+    page: {
+      dashboard: "Aujourd'hui",
+    },
+  },
   resources: {
     companies: {
       name: "Entreprise |||| Entreprises",
