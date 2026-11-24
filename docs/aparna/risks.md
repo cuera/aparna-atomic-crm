@@ -16,11 +16,12 @@
 - **R-11 — Payment edge cases.** Partial payments, refunds, currency mismatch. Mitigation: v1 supports full payment per link only; refunds handled in Razorpay dashboard and noted manually; reconcile at Gate C.
 - **R-12 — Upstream drift.** Pulling upstream Atomic CRM changes may conflict with our schema and UI renames. Mitigation: merge upstream only between slices, on a branch, with the full verify set green.
 
-- **R-13 — First sign-up takes the Owner role.** On a fresh Supabase project the first person to sign up becomes administrator; later sign-ups are blocked unless invited. Mitigation: the Owner signs up immediately after the first production deploy; verify `sales` has exactly the expected users.
+- **R-13 — First sign-up takes the Owner role.** On a fresh Supabase project the first person to sign up becomes administrator; later sign-ups are blocked unless invited. Mitigation (ADR-A19): "Allow new users to sign up" is off in Supabase Auth from project creation, before any GitHub secret exists; the first account is created from the Supabase dashboard after the first Deploy run; every later account comes only by invitation; M-107 records `sales` (administrator = true only for the first account).
 - **R-14 — MVP debt hardens.** The longer the MVP runs, the more data sits in temporary columns (ADR-A12). Mitigation: start T1 within 8 weeks of MVP go-live or before the first multi-child family, whichever is first.
-- **R-15 — One verifier fails silently.** If the cloud stack or GitHub Actions breaks, a slice could merge with only one layer of checks. Mitigation: a PR merges only with green local evidence pasted AND a green `Check` run; check Actions usage monthly.
-- **R-16 — Location data misuse.** Staff coordinates could be read by someone who should not see them. Mitigation: ADR-A17 (consent, Owner-only RLS with pgTAP tests, 90-day retention, production owned by the client, no developer access to production data).
+- **R-15 — One verifier fails silently.** If the cloud stack or GitHub Actions breaks, a slice could merge with only one layer of checks. Mitigation: a PR merges only with a green `Check` run (from M1, light mode makes it the evidence, ADR-A20) after the slice ran its checks locally; check Actions usage monthly.
+- **R-16 — Location data misuse.** Staff coordinates could be read by someone who should not see them. Mitigation: ADR-A17 (consent, Owner-only RLS with pgTAP tests, 90-day retention, production owned by the Owner from handover onward (M-504), no developer access to production data).
+- **R-17 — Deny rules can be bypassed.** The `.claude/settings.json` deny rules match command prefixes and the Read tool only: `cat .env.production` or `cd x && npx supabase db push` can get past them. Known limit, accepted (ADR-A19): the deny rules are hardening; the real control is that cloud environments hold no secrets (`KICKOFF.md` A4, ADR-A15). No extra rules are added.
 
 ## Provenance & audit
 Sources: loop-engineering default risks R-1..R-5 (renamed to fit), project analysis.
-Checked: each risk names a mitigation that exists in a file, a feature or a gate.
+Checked: each risk names a mitigation that exists in a file, a feature or a gate (R-13, R-15, R-16 updated and R-17 added by ADR-A19/A20, 23 Nov 2026).

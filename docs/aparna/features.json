@@ -1,10 +1,11 @@
 {
   "_rules": [
     "Claude may ONLY change the 'passes' field. Never delete, reword or reorder features; propose changes in decisions.md instead.",
-    "Set 'passes' to true only after the 'verify' command ran green in the same session and its output is quoted in progress.md.",
+    "Set 'passes' to true only when the verify is green. M0 and full-build slices: the verify ran green in the session and its output is quoted in progress.md. MVP slices M1-M5 (light mode, ADR-A20): the slice PR's Check run is green and runs the feature's verify (cmd: specs in its unit job, ci: specs in its e2e job); manual: features flip only when the human confirms.",
     "verify prefixes: 'cmd:' run the command; 'e2e:' Playwright spec; 'sql:' pgTAP file run by npx supabase test db; 'manual:' a human step recorded in progress.md.",
     "'ci:' = the GitHub Actions 'Check' workflow is green on the slice PR and includes the named test (used for checks that need Docker: migrations, pgTAP, Playwright).",
-    "MVP features (slices M0-M5) come first. Full-build features that the MVP already covers are listed in TRANSITION.md section 2 and are re-verified, not rebuilt."
+    "MVP features (slices M0-M5) come first. Full-build features that the MVP already covers are listed in TRANSITION.md section 2 and are re-verified, not rebuilt.",
+    "A verify that joins parts with ' + ' is green only when every part is green."
   ],
   "features": [
     {
@@ -46,11 +47,12 @@
       "acceptance": [
         "cloud session: npm ci, docker info, make start, make typecheck, make lint and make test all run (or the failure is recorded and ADR-A15 falls back)",
         "assumptions in KICKOFF.md M0 checked with file:line evidence",
-        "gate-reviewer MODE gate on MVP.md, TRANSITION.md, decisions A11-A15 scores >= 80, no blocking findings",
+        "gate-reviewer MODE gate on MVP.md, TRANSITION.md, decisions ADR-A11..A16 scores >= 80, no blocking findings",
+        "ADR-A11..A16, A18, A19 and A20 marked Accepted",
         "Owner go recorded"
       ],
       "verify": "manual:Gate MVP-A entry in progress.md",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-101",
@@ -58,9 +60,12 @@
       "title": "Domain config",
       "acceptance": [
         "title, stages (enquiry, trial_booked, trial_done, payment_pending, enrolled, lost), task types, courses, boards, sources, lost reasons, currency INR set in defaultConfiguration.ts",
+        "new keys (courses, boards, sources, lost reasons) added to ConfigurationContextValue; saving the Settings page keeps them",
+        "dealPipelineStatuses = [enrolled]; a new admission defaults to stage enquiry (the upstream 'opportunity' default in deals/DealInputs.tsx is removed)",
+        "stages are shown read-only on the Settings page during the MVP",
         "same config visible in demo mode and real mode"
       ],
-      "verify": "cmd:make typecheck && make test",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/root/mvpConfiguration.test.tsx",
       "passes": false
     },
     {
@@ -68,10 +73,13 @@
       "slice": "M1",
       "title": "Labels and menu",
       "acceptance": [
-        "UI says Admission/Admissions and Parent/Parents instead of Deal and Contact",
-        "Companies hidden from the menu"
+        "UI says Admission/Admissions and Parent/Parents instead of Deal and Contact (providers/commons/englishCrmMessages.ts and the hard-coded label in companies/CompanyCard.tsx)",
+        "Companies hidden from the menu (layout/Header.tsx), not deleted",
+        "an admission can be saved without a company (company_id no longer required in deals/DealInputs.tsx)",
+        "the dashboard tab label (ra.page.dashboard) reads Today",
+        "every upstream e2e spec that M1 breaks (labels, next-action check) is fixed in the M1 PR, e.g. e2e/createContactFromDeal.spec.ts"
       ],
-      "verify": "ci:e2e/aparna/mvpBoard.spec.ts",
+      "verify": "ci:e2e/aparna/mvpLabels.spec.ts",
       "passes": false
     },
     {
@@ -81,9 +89,12 @@
       "acceptance": [
         "deals and contacts columns from MVP.md section 4 exist in supabase/schemas and in one migration generated with supabase db diff",
         "types.ts updated",
-        "contacts_summary view still valid"
+        "contacts_summary view still valid",
+        "Parents and Admissions CSV export include the new fields",
+        "deals.next_action_at has a permanent default of now() + interval '1 day'",
+        "deals.stage_changed_at is set by a trigger on insert and on every stage change; the same trigger sets enrolled_at when the stage becomes enrolled"
       ],
-      "verify": "ci:migrations apply in Check e2e job",
+      "verify": "ci:supabase/tests/mvp_schema.test.sql + cmd:npx vitest run --project app src/components/atomic-crm/misc/mvpCsvExport.test.ts",
       "passes": false
     },
     {
@@ -91,7 +102,7 @@
       "slice": "M1",
       "title": "MVP constraints",
       "acceptance": [
-        "open stage without next_action_at is rejected",
+        "a stage not in (enrolled, lost) without next_action_at is rejected: check deals_open_needs_next_action = stage not in ('enrolled','lost') => next_action_at is not null; clearing next_action_at on an open stage is rejected, an insert without it gets the default",
         "lost without lost_reason is rejected",
         "duplicate phone_e164 is rejected"
       ],
@@ -103,10 +114,10 @@
       "slice": "M1",
       "title": "pgTAP in CI",
       "acceptance": [
-        "Check workflow runs npx supabase test db after Supabase starts",
+        "start-supabase-e2e copies supabase/tests into .supabase-e2e; the Check e2e job runs npx supabase test db --workdir .supabase-e2e after make test-e2e-ci",
         "a failing test fails the PR"
       ],
-      "verify": "ci:Check workflow log shows supabase test db",
+      "verify": "manual:progress.md links a Check run on a throwaway commit where a deliberately failing pgTAP test turned Check red, and the green run after it was reverted",
       "passes": false
     },
     {
@@ -114,9 +125,10 @@
       "slice": "M1",
       "title": "Realistic demo data",
       "acceptance": [
-        "FakeRest generators create parents (Indian and foreign numbers, time zones), admissions in every stage with next actions, enrolled students with fees"
+        "FakeRest generators create parents (Indian and foreign numbers, time zones), admissions in every stage with next actions, enrolled students with fees",
+        "the spec asserts every stage is present, at least one foreign number carries a non-IST time zone, and every enrolled admission has fee amount, period and next fee due"
       ],
-      "verify": "cmd:make test",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/providers/fakerest/dataGenerator/mvpData.test.ts",
       "passes": false
     },
     {
@@ -125,10 +137,39 @@
       "title": "Deploy",
       "acceptance": [
         "Vercel Preview builds demo mode, Production builds real mode",
-        "Deploy workflow pushed migrations to the Supabase project",
-        "Owner signed up first; Counsellor invited"
+        "Deploy workflow pushes migrations to the Supabase project (supabase link, db push and functions deploy kept)",
+        "deploy-doc, deploy-demo and the GitHub Pages steps of deploy-supabase removed from deploy.yml (Vercel replaces them)",
+        "SSO / Google Workspace sign-in off in production: VITE_GOOGLE_WORKPLACE_DOMAIN unset and no SSO provider enabled in Supabase Auth",
+        "R-13: 'Allow new users to sign up' was off in Supabase Auth and custom SMTP was configured before the GitHub secrets were added (KICKOFF.md Part A order)",
+        "after the first Deploy run, the developer creates the first test account (owner email alias) from the Supabase dashboard; progress.md records administrator = true only for that account",
+        "the second test account (counsellor email alias) is created only by in-app invitation; an invitation works with sign-ups off, proven on the local stack",
+        "build and test phase: Supabase and Vercel in the developer's account, test accounts on developer email aliases, synthetic data only (ADR-A20); handover is M-504"
       ],
       "verify": "manual:production URL, preview URL and login check in progress.md",
+      "passes": false
+    },
+    {
+      "id": "M-108",
+      "slice": "M1",
+      "title": "Two-staff cap (ADR-A14)",
+      "acceptance": [
+        "a trigger on sales refuses an insert or re-enable that would create a third active row (disabled = false)",
+        "the error names ADR-A14 and F-101: MVP allows two staff accounts (Owner and Counsellor); no Teacher accounts until role-based access (F-101) passes",
+        "the trigger is dropped only by the F-101 slice (TRANSITION.md T5)"
+      ],
+      "verify": "ci:supabase/tests/mvp_staff_cap.test.sql",
+      "passes": false
+    },
+    {
+      "id": "M-109",
+      "slice": "M1",
+      "title": "mark_fee_paid function",
+      "acceptance": [
+        "SQL function mark_fee_paid(deal_id, shown_due) runs one UPDATE ... WHERE id = deal_id AND next_fee_due = shown_due (advancing next_fee_due by fee_period) and inserts the fee note in the same transaction",
+        "it returns whether it applied",
+        "pgTAP calls it twice with the same shown_due: one period advance, one note, the second call returns false"
+      ],
+      "verify": "ci:supabase/tests/mark_fee_paid.test.sql",
       "passes": false
     },
     {
@@ -151,9 +192,11 @@
       "acceptance": [
         "one dialog creates parent + admission in enquiry with next_action_at now+2h",
         "duplicate number links the existing parent and warns",
-        "button on board header"
+        "parent timezone set from the country guess and editable; tested with one US (+1) and one UK (+44) number",
+        "button on the board header only (the Today button is M-403)",
+        "the admission name is set to the child name (no name field)"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/contacts",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/contacts/QuickAddEnquiry.test.tsx",
       "passes": false
     },
     {
@@ -161,10 +204,11 @@
       "slice": "M2",
       "title": "Next action required",
       "acceptance": [
-        "edit form blocks save of an open stage without next action",
-        "dragging to an open stage without next action asks for one"
+        "every open admission always has a next action (DB default tomorrow, editable)",
+        "the edit form cannot clear the next action on a stage not in (enrolled, lost)",
+        "moving from enrolled or lost back to an open stage without a next action asks for one"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/nextActionRequired.test.tsx",
       "passes": false
     },
     {
@@ -172,7 +216,7 @@
       "slice": "M2",
       "title": "Lost reason",
       "acceptance": ["moving to Lost asks for a reason from the fixed list"],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/lostReason.test.tsx",
       "passes": false
     },
     {
@@ -180,9 +224,21 @@
       "slice": "M2",
       "title": "Board card",
       "acceptance": [
-        "card shows child, course, next action (red when overdue), days in stage"
+        "card shows child, course, next action (red when overdue), days in stage (from stage_changed_at)"
       ],
-      "verify": "ci:e2e/aparna/mvpBoard.spec.ts",
+      "verify": "ci:e2e/aparna/mvpBoardCard.spec.ts",
+      "passes": false
+    },
+    {
+      "id": "M-206",
+      "slice": "M2",
+      "title": "Stage data entry",
+      "acceptance": [
+        "moving to trial_booked asks for trial_at",
+        "moving to enrolled asks for fee amount, fee period and next fee due (enrolled_at is set by the M-103 trigger)",
+        "the edit form shows child fields (child name, grade, board, course, source) and fee fields; the admission name field is hidden and set to the child name"
+      ],
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/stageDataEntry.test.tsx",
       "passes": false
     },
     {
@@ -192,9 +248,10 @@
       "acceptance": [
         "landing page after login",
         "sections: New with minutes-waiting timer, Follow-ups due/overdue, Trials today/tomorrow, Payment pending, Fees due in 3 days/overdue",
-        "each row opens the admission"
+        "each row opens the admission",
+        "Today replaces both the desktop and the mobile dashboard"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/TodayPage.test.tsx",
       "passes": false
     },
     {
@@ -213,10 +270,11 @@
       "slice": "M3",
       "title": "WhatsApp templates",
       "acceptance": [
-        "8 templates from MVP.md section 6 with filled variables",
+        "9 templates from MVP.md section 6 (including progress_update) with filled variables",
+        "each template carries its default follow-up offset from MVP.md section 6",
         "wa.me URL uses E.164 digits and URL-encodes text"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp/templates.test.ts",
       "passes": false
     },
     {
@@ -224,11 +282,13 @@
       "slice": "M3",
       "title": "One-tap send and log",
       "acceptance": [
-        "button opens wa.me in a new tab",
+        "buttons on the Admission detail (show) page and on Today rows open wa.me in a new tab",
         "confirm dialog logs note 'WhatsApp: <key>', sets first_response_at if empty, sets next follow-up",
-        "payment_link and fee_reminder ask for the Razorpay link first"
+        "payment_link and fee_reminder ask for the Razorpay link first",
+        "buttons are disabled with a visible reason when whatsapp_opt_in = false",
+        "the Parent form can switch whatsapp_opt_in off"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp/WhatsAppSend.test.tsx",
       "passes": false
     },
     {
@@ -236,10 +296,12 @@
       "slice": "M3",
       "title": "Mark fee paid",
       "acceptance": [
-        "moves next_fee_due forward by fee_period",
-        "logs a note with amount"
+        "the button calls the M-109 function mark_fee_paid through a custom dataProvider method markFeePaid (Supabase: RPC; FakeRest: the same compare-and-set in memory)",
+        "it moves next_fee_due forward by fee_period and logs a note with amount",
+        "a second submit with the same shown date changes nothing, logs no second note and tells the user it was already marked",
+        "the spec submits twice and asserts one period advance and one note"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/markFeePaid.test.tsx",
       "passes": false
     },
     {
@@ -247,33 +309,47 @@
       "slice": "M3",
       "title": "This-week strip",
       "acceptance": [
-        "shows enquiries, median first-response time, trials, enrolled, lost by reason for the current week"
+        "shows enquiries, median first-response time, trials, enrolled (from enrolled_at), lost by reason (from stage_changed_at) for the current week"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/ThisWeekStrip.test.tsx",
       "passes": false
     },
     {
       "id": "M-401",
       "slice": "M4",
-      "title": "Import current students",
+      "title": "Import admissions",
       "acceptance": [
-        "CSV: parent name, phone, country, child name, grade, board, course, fee amount, fee period, next fee due",
-        "dry run lists row errors and duplicates by phone",
-        "creates parent + enrolled admission",
-        "sample CSV downloadable"
+        "one admissions importer; CSV columns: parent name, phone, country, child name, grade, board, course, source, stage, next follow-up, trial_at, note, fee amount, fee period, next fee due, lost reason; the admission name is the child name",
+        "stage = enrolled creates parent + enrolled admission with fee fields (current students); any other stage creates parent + admission in that stage (enquiries)",
+        "rows in a stage not in (enrolled, lost) without next follow-up get tomorrow 10:00 IST",
+        "a phone that matches an existing parent links that parent instead of creating a duplicate",
+        "sample CSV downloadable; tests use synthetic CSVs only; *.real.csv and imports/ are in .gitignore; real files are imported by a human in the production UI"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport/useAdmissionImport.test.ts",
       "passes": false
     },
     {
       "id": "M-402",
       "slice": "M4",
-      "title": "Import open enquiries",
+      "title": "Import validation pass (dry run)",
       "acceptance": [
-        "CSV: parent, phone, child, course, source, stage, next follow-up, note",
-        "rows without next follow-up get tomorrow 10:00 IST"
+        "every row is validated before anything is written: required columns, phone normalises with the M-201 helper, stage in the fixed list, enrolled rows have fee amount, fee period and next fee due, lost rows have a lost reason",
+        "if any row fails, nothing is written and the dialog lists each failing row number with its reason",
+        "rows whose phone matches an existing parent or another row are listed as 'links to existing parent' (not an error)",
+        "a fully valid file is imported in one go"
       ],
-      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport",
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport/validateAdmissionRows.test.ts",
+      "passes": false
+    },
+    {
+      "id": "M-403",
+      "slice": "M4",
+      "title": "Quick-add on Today",
+      "acceptance": [
+        "the Today screen shows the M-202 quick-add button (reuses the M2 component, no copy)",
+        "it creates the same parent + admission as the board button"
+      ],
+      "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/TodayQuickAdd.test.tsx",
       "passes": false
     },
     {
@@ -304,9 +380,24 @@
       "slice": "M5",
       "title": "Pilot fixes",
       "acceptance": [
-        "every pilot issue is fixed, or deferred with a row in problems.md"
+        "every pilot issue is fixed, or deferred with a row in problems.md",
+        "drift check: npx supabase db diff --local reports no schema changes; output pasted in progress.md"
       ],
       "verify": "manual:issue list in progress.md",
+      "passes": false
+    },
+    {
+      "id": "M-504",
+      "slice": "M5",
+      "title": "Handover to the Owner's accounts",
+      "acceptance": [
+        "Supabase project and Vercel project transferred to the Owner's accounts",
+        "Supabase secret keys rotated; GitHub and Vercel secrets updated",
+        "the test counsellor account is disabled; the test owner account invites the Owner with administrator on; the Owner sets a password",
+        "the Owner disables the test owner account and invites the Counsellor, who sets her own password",
+        "only then does the real data import start (M-401, by a human in the production UI)"
+      ],
+      "verify": "manual:handover checklist (KICKOFF.md Part F) ticked in progress.md",
       "passes": false
     },
     {
@@ -1108,7 +1199,7 @@
       "slice": "SF",
       "title": "Production ownership",
       "acceptance": [
-        "production Supabase project and Vercel production are in the client's account",
+        "production Supabase project and Vercel production are in the Owner's account from handover (M-504) onward",
         "Intrigues accounts have no production database or service-role access"
       ],
       "verify": "manual:Owner confirms in progress.md",
