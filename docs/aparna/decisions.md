@@ -162,7 +162,7 @@ Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A14,
 - Reversal condition: M1 planning shows one of these cannot be built inside the fork's conventions → amend through a new ADR before the M1 PR.
 
 ### ADR-A20 — Light mode and handover
-Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A17, `features.json` `_rules` and F-1105, the aparna-loop skill, `KICKOFF.md`
+Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A01 (reversal condition), ADR-A09 (MVP slices run in light mode), ADR-A17, `features.json` `_rules` and F-1105, the aparna-loop skill, `KICKOFF.md`
 - Context: the MVP is small and its rules are now enforced by the database, CI and permissions. Per-slice gate reviews and pasted evidence cost more than they catch from M1 on. The production accounts also need a clear owner.
 - Options: A) light mode from M1 plus a handover checklist. B) keep the full per-slice evidence loop. C) build in the Owner's accounts from day one.
 - Decision: A.

@@ -10,18 +10,18 @@ One session = one slice = one branch = one PR. Handoff between sessions = `featu
 ## START
 
 1. `git status --short`, `git branch --show-current`, `git log --oneline -5`.
-2. Read: the last entry of `docs/aparna/progress.md`; the slice's features in `docs/aparna/features.json`; its row and file ownership in `docs/aparna/MVP.md` §7.
+2. Read: the last entry of `docs/aparna/progress.md`; the slice's features in `docs/aparna/features.json`; its row and file ownership in `docs/aparna/MVP.md` §7. Full-build slices: the slice row in `project_plan.md` §3 and `TRANSITION.md` instead of `MVP.md`.
 3. Every slice it depends on is merged into `main` (`git log origin/main`); if not, stop and say which.
 4. Set up: `npm ci` (on `ENOTEMPTY`: `rm -rf node_modules`, repeat; P-12); then `npx playwright install chromium` (after `npm ci`, P-14); if `docker info` fails: `sudo sh -c 'nohup dockerd > /tmp/dockerd.log 2>&1 &'` and poll `docker info` (P-13); `make start` in the background. Run `make typecheck`, `make lint`, `make test`. Red baseline → report and stop.
-5. Report in ≤ 5 lines (slice, features, owned files, baseline, open questions), then the plan: files and the spec file per feature. No edits until "go".
+5. Report in ≤ 5 lines (slice, features, owned files, baseline, open questions), then the plan: files and the spec file per feature. Before asking for go, grep `src/` and `e2e/` test files for every user-visible string the slice changes, and list the hits as owned files (P-25). No edits until "go".
 
 ## CLOSE
 
 1. Each feature's verify spec exists; run the slice's specs locally once. No evidence pasting.
 2. Commit, push, open a PR titled `[<slice>] <summary>` listing the feature IDs and the one thing to check on the Preview.
-3. Wait for the `Check` run. Red → fix and push (max 3 rounds on the same cause, then stop and ask).
+3. Wait for the `Check` run. Red → fix and push (max 3 rounds on the same cause, then stop and ask). 0 checks is not green: stop.
 4. Green → set `passes: true` for the slice's `cmd:` and `ci:` features (`_rules`); `manual:` features only after the human confirms.
-5. Append one line to `docs/aparna/progress.md`: date, slice, PR link, features passed. A surprise or a human correction → a row in `problems.md`, encoded at the strongest layer (DB constraint or hook > `.claude/rules` > `CLAUDE-aparna.md` > skill). User-visible change → `docs/aparna/CHANGELOG.md`.
+5. Append one line to `docs/aparna/progress.md`: date, slice, PR link, features passed. A surprise or a human correction → a row in `problems.md`, encoded at the strongest layer (DB constraint or hook > `.claude/rules` > `CLAUDE-aparna.md` > skill). A choice with alternatives → ADR in `decisions.md` (Proposed). User-visible change → `docs/aparna/CHANGELOG.md`.
 6. Tell the human: PR link, Preview link, the one thing to check. The human merges.
 
 ## Hard rules (never relaxed by light mode)

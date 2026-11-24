@@ -23,7 +23,7 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 ## Rules that are easy to miss
 
 - Only `passes` may change in `docs/aparna/features.json`. MVP slices from M1 (light mode, ADR-A20): it flips when the slice PR's `Check` is green; `manual:` features only on the human's confirmation.
-- MVP slice flow: plan → human go → build → PR → `Check` green → human checks the Vercel Preview → human merges. One line per slice in `progress.md`.
+- MVP slices M1–M5 run in light mode (ADR-A20); steps in /aparna-loop.
 - MVP: **no Teacher accounts** until F-101 passes (ADR-A14). Only Owner and Counsellor; a `sales` trigger caps active staff at 2 (M-108); SSO stays off.
 - MVP: the next-action DB check is a closed list (`stage not in ('enrolled','lost')`), so stages are read-only in Settings (a saved DB config overrides defaults per key, P-15).
 - Real student or enquiry files never enter a cloud session or git; importers are tested with synthetic CSVs only.
@@ -45,9 +45,17 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 - Planning chat sandboxes are not Claude Code cloud sessions: check facts about the cloud VM in code.claude.com docs or in the session itself (P-10).
 - First user on a fresh Supabase project becomes the administrator (R-13): sign-ups are OFF in Supabase Auth from project creation; first account from the dashboard after the first Deploy, all others by invitation (ADR-A19).
 - Until handover (M-504): Supabase and Vercel in the developer's account, test accounts on developer email aliases, synthetic data only (ADR-A20).
+- CI keeps sign-ups on only in `supabase/config.e2e.toml` (the onboarding spec signs up through the UI); production Supabase Auth stays off (R-13).
+- `mark_fee_paid` advances by calendar month: 31 Jan → 28 Feb, then the due day stays on the 28th (accepted by the Owner, M1).
+- The app merges parents through the `merge_contacts` edge function, which calls SQL `public.merge_contacts`; demo mode merges in `providers/commons/mergeContacts.ts`. Keep both rule sets equal.
+- Cloud session proxy: Docker containers do not trust its CA, so `supabase db diff` (migra) and local edge functions fail to fetch packages. Generate migrations with `--use-pg-delta --db-url` against a throwaway instance built from `supabase/schemas` (P-26).
+- `bash-guard` refuses Playwright e2e for every caller, the main session included: e2e specs are verified by the CI `e2e-test` job (P-27).
 
 ## Mistakes Log
 
 - 2026-11-21 — assumed Claude Code cloud sessions lack Docker from a check in a different sandbox → encoded as: fact above (Gotchas) + `docker info` in M-001 acceptance.
+
+- 2026-11-24 — a PR with 0 checks is not a green PR (Actions was off on the fork; PR #1 and #2 merged with no CI) → encoded as: KICKOFF A1 steps 2–3 + aparna-loop CLOSE "0 checks is not green: stop." (P-22).
+- 2026-11-24 — an amendment targeted an unused function (SQL `merge_contacts`; the app calls the edge function): check callers before changing a function → encoded as: the edge function now calls the SQL function (P-24).
 
 <!-- YYYY-MM-DD — what failed → encoded as <hook|rule|fact|skill>: <where> -->
