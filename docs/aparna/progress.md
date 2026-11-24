@@ -129,3 +129,7 @@ FINDINGS:
 - [low] TRANSITION T1/T8: payback steps for `deals.name` = child name and for the `first_response_at`, `stage_changed_at` and `enrolled_at` columns once `students`/`enrolments` exist.
 - [low] M2 and M3 both append to `progress.md`: the second PR to merge rebases it.
 - [low] `CLAUDE-aparna.md` line "MVP slice flow: …" is a procedure in a facts file: replace with "MVP slices M1–M5 run in light mode (ADR-A20); steps in /aparna-loop".
+
+### 2026-11-24 — M1 Foundation (light mode)
+
+- [cuera/aparna-atomic-crm#3](https://github.com/cuera/aparna-atomic-crm/pull/3): Check green on `c38a058` (5 required jobs; pgTAP 5 files, 88 assertions in `e2e-test`). `passes: true`: M-101, M-102, M-103, M-104, M-106, M-108, M-109. Awaiting the Owner: M-105 (red run https://github.com/cuera/aparna-atomic-crm/actions/runs/45434888103/job/138590456682, green after revert https://github.com/cuera/aparna-atomic-crm/actions/runs/45435848670/job/138593963208) and M-107 (Part A2/A3/A5 clicks; `administrator = true` for the first account only). Lost-column drag fails until M2's lost-reason prompt (S2, accepted).
