@@ -379,4 +379,8 @@ GRANT EXECUTE ON FUNCTION "public"."mark_fee_paid"(bigint, date) TO "authenticat
 
 REVOKE ALL ON FUNCTION "public"."merge_contacts"(bigint, bigint) FROM PUBLIC;
 
+-- New Supabase projects no longer grant public objects to the API roles by default, and no
+-- earlier migration granted merge_contacts: the edge function runs it as authenticated.
+GRANT EXECUTE ON FUNCTION "public"."merge_contacts"(bigint, bigint) TO "authenticated", "service_role";
+
 GRANT ALL ON TABLE "public"."contacts_summary" TO "anon", "authenticated", "service_role";

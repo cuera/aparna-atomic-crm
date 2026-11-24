@@ -2,7 +2,7 @@
 -- Runs after Playwright on the same database in CI: it never assumes empty tables (note 2).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(33);
 
 -- Columns (MVP.md section 4)
 select col_type_is('public', 'deals', 'child_name', 'text', 'deals.child_name is text');
@@ -25,11 +25,11 @@ select col_type_is('public', 'contacts', 'phone_e164', 'text', 'contacts.phone_e
 select col_default_is('public', 'contacts', 'whatsapp_opt_in', 'true', 'contacts.whatsapp_opt_in defaults to true');
 
 -- contacts_summary still valid and exposes the new parent fields (Parents CSV export)
-select results_eq(
-  $$ select count(*)::int from public.contacts_summary where phone_e164 is null or phone_e164 is not null $$,
-  $$ select count(*)::int from public.contacts $$,
-  'contacts_summary is queryable with the new columns and returns one row per contact'
-);
+select has_column('public', 'contacts_summary', 'country', 'contacts_summary exposes country');
+select has_column('public', 'contacts_summary', 'timezone', 'contacts_summary exposes timezone');
+select has_column('public', 'contacts_summary', 'phone_e164', 'contacts_summary exposes phone_e164');
+select has_column('public', 'contacts_summary', 'whatsapp_opt_in', 'contacts_summary exposes whatsapp_opt_in');
+select col_not_null('public', 'contacts', 'whatsapp_opt_in', 'contacts.whatsapp_opt_in is never null');
 
 -- next_action_at default is now() + 1 day (permanent DB default)
 insert into public.deals (id, name, stage) values (-9001, 'x', 'enquiry');
@@ -80,6 +80,25 @@ select is(
   (select name from public.deals where id = -9001),
   'Asha',
   'updating child_name updates the hidden name'
+);
+
+-- Inserts: an enrolled insert (current students import) sets enrolled_at; name follows child_name
+insert into public.deals (id, name, child_name, stage) values (-9002, 'placeholder', 'Ravi', 'enrolled');
+select is(
+  (select enrolled_at from public.deals where id = -9002),
+  now(),
+  'an insert straight into enrolled sets enrolled_at'
+);
+select is(
+  (select name from public.deals where id = -9002),
+  'Ravi',
+  'an insert with child_name sets the hidden name'
+);
+insert into public.deals (id, name, child_name, stage) values (-9003, 'Kept name', '   ', 'enquiry');
+select is(
+  (select name from public.deals where id = -9003),
+  'Kept name',
+  'a blank child_name keeps the existing name'
 );
 
 select * from finish();

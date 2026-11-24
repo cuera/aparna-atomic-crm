@@ -122,6 +122,7 @@ jobs:
         run: make test-e2e-ci
       # pgTAP on the same e2e database, after Playwright (M-105); each test file sets its own baseline.
       - name: Run pgTAP database tests
+        if: ${{ !cancelled() }}
         run: npx supabase test db --workdir .supabase-e2e
 
     build:

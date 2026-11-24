@@ -48,7 +48,8 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 - CI keeps sign-ups on only in `supabase/config.e2e.toml` (the onboarding spec signs up through the UI); production Supabase Auth stays off (R-13).
 - `mark_fee_paid` advances by calendar month: 31 Jan → 28 Feb, then the due day stays on the 28th (accepted by the Owner, M1).
 - The app merges parents through the `merge_contacts` edge function, which calls SQL `public.merge_contacts`; demo mode merges in `providers/commons/mergeContacts.ts`. Keep both rule sets equal.
-- Cloud session proxy: Docker containers do not trust its CA, so `supabase db diff` (migra) and local edge functions fail to fetch packages. Generate migrations with `--use-pg-delta --db-url` against a throwaway instance built from `supabase/schemas` (P-26).
+- Cloud session proxy: Docker containers do not trust its CA, so `supabase db diff` (migra) and local edge functions fail to fetch packages. Generate migrations with `--use-pg-delta --db-url` against a throwaway instance built from `supabase/schemas`; serve edge functions with an `--env-file` that sets `SSL_CERT_FILE` / `DENO_CERT` / `DENO_TLS_CA_STORE` to a CA copy under `supabase/functions/` (P-26).
+- Supabase client calls return `{ error }` and do not throw; every security-relevant write must check it (P-30).
 - `bash-guard` refuses Playwright e2e for every caller, the main session included: e2e specs are verified by the CI `e2e-test` job (P-27).
 
 ## Mistakes Log

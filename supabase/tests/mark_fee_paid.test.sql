@@ -2,12 +2,14 @@
 -- Runs after Playwright on the same database in CI: it only touches its own rows (note 2).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(17);
 
 insert into public.deals (id, name, stage, fee_amount_paise, fee_period, next_fee_due)
 values
   (-9201, 'Monthly child', 'enrolled', 250000, 'monthly', '2026-12-01'),
-  (-9202, 'Quarterly child', 'enrolled', 700000, 'quarterly', '2026-12-01');
+  (-9202, 'Quarterly child', 'enrolled', 700000, 'quarterly', '2026-12-01'),
+  (-9203, 'No period child', 'enrolled', 300000, null, '2026-12-01'),
+  (-9204, 'No due date child', 'enrolled', 300000, 'monthly', null);
 
 -- Called the way the app calls it: as a signed-in user, under RLS
 create temp table fee_calls (n int, applied boolean);
@@ -52,11 +54,30 @@ select is(
   false,
   'anon has no EXECUTE on mark_fee_paid'
 );
-select is(
-  (select count(*)::int from pg_proc, aclexplode(proacl) where oid = 'public.mark_fee_paid(bigint, date)'::regprocedure and grantee = 0),
-  0,
-  'PUBLIC has no EXECUTE on mark_fee_paid'
+select ok(
+  (select proacl is not null
+     and not exists (select 1 from aclexplode(proacl) where grantee = 0 and privilege_type = 'EXECUTE')
+   from pg_proc where oid = 'public.mark_fee_paid(bigint, date)'::regprocedure),
+  'PUBLIC has no EXECUTE on mark_fee_paid (explicit ACL without a PUBLIC entry)'
 );
+
+-- A due date without a fee period is an error, not "already updated", and changes nothing
+select throws_like(
+  $$ select public.mark_fee_paid(-9203, '2026-12-01') $$,
+  '%no fee period%',
+  'a due date without a fee period raises'
+);
+select is(
+  (select next_fee_due from public.deals where id = -9203),
+  '2026-12-01'::date,
+  'the failed call leaves next_fee_due unchanged'
+);
+select is(
+  (select count(*)::int from public.deal_notes where deal_id = -9203),
+  0,
+  'the failed call writes no note'
+);
+select is(public.mark_fee_paid(-9204, '2026-12-01'), false, 'an admission without a next fee due date returns false');
 select is(
   has_function_privilege('authenticated', 'public.mark_fee_paid(bigint, date)', 'execute'),
   true,

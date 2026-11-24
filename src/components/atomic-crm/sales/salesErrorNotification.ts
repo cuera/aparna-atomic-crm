@@ -5,6 +5,8 @@ export type SalesErrorNotification = {
 
 const MESSAGE_BY_CODE: Record<string, string> = {
   email_taken: "crm.profile.email_taken",
+  // Two-staff cap refused a re-enable (ADR-A14, M-108)
+  staff_cap_reached: "crm.profile.staff_cap_reached",
   secondary_email_taken: "crm.profile.secondary_email_taken",
   secondary_email_is_primary: "crm.profile.secondary_email_is_primary",
   invalid_secondary_email: "crm.profile.secondary_email_invalid",

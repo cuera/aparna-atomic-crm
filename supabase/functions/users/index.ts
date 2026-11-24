@@ -9,13 +9,31 @@ import {
   MAX_SECONDARY_EMAILS,
   normalizeSecondaryEmails,
 } from "./secondaryEmails.ts";
+import {
+  applyStaffAccess,
+  isStaffCapError,
+  STAFF_CAP_ERROR_CODE,
+} from "./staffAccess.ts";
 
+// Supabase calls return { error } instead of throwing: a refused write (e.g. the
+// two-staff cap trigger, ADR-A14) must never be ignored.
 async function updateSaleDisabled(user_id: string, disabled: boolean) {
-  return await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from("sales")
     .update({ disabled: disabled ?? false })
     .eq("user_id", user_id);
+  if (error) throw error;
 }
+
+async function updateLoginBan(user_id: string, banned: boolean) {
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+    ban_duration: banned ? "87600h" : "none",
+  });
+  if (error) throw error;
+}
+
+const staffCapResponse = (error: { message: string }) =>
+  createErrorResponse(409, error.message, { code: STAFF_CAP_ERROR_CODE });
 
 async function updateSaleAdministrator(
   user_id: string,
@@ -255,6 +273,7 @@ async function inviteUser(req: Request, currentUserSale: any) {
       },
     );
   } catch (e) {
+    if (isStaffCapError(e)) return staffCapResponse(e);
     console.error("Error patching sale:", e);
     return createErrorResponse(500, "Internal Server Error");
   }
@@ -355,9 +374,6 @@ async function patchUser(req: Request, currentUserSale: any) {
   const { data, error: userError } =
     await supabaseAdmin.auth.admin.updateUserById(sale.user_id, {
       email,
-      ...(currentUserSale.administrator && {
-        ban_duration: disabled ? "87600h" : "none",
-      }),
       user_metadata: { first_name, last_name },
     });
 
@@ -400,8 +416,13 @@ async function patchUser(req: Request, currentUserSale: any) {
   }
 
   try {
-    await updateSaleDisabled(data.user.id, disabled);
-    const sale = await updateSaleAdministrator(data.user.id, administrator);
+    // The login ban and sales.disabled change together, restrictive step first (staffAccess.ts)
+    const userId = data.user.id;
+    await applyStaffAccess(disabled ?? false, {
+      setSaleDisabled: (value) => updateSaleDisabled(userId, value),
+      setLoginBan: (value) => updateLoginBan(userId, value),
+    });
+    const sale = await updateSaleAdministrator(userId, administrator);
     return new Response(
       JSON.stringify({
         data: sale,
@@ -414,6 +435,7 @@ async function patchUser(req: Request, currentUserSale: any) {
       },
     );
   } catch (e) {
+    if (isStaffCapError(e)) return staffCapResponse(e);
     console.error("Error patching sale:", e);
     return createErrorResponse(500, "Internal Server Error");
   }

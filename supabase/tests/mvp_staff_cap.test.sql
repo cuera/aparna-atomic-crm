@@ -3,7 +3,7 @@
 -- sales rows, so this file disables every existing row first (note 2). All of it rolls back.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(7);
+select plan(9);
 
 update public.sales set disabled = true;
 
@@ -51,6 +51,16 @@ select is(
   (select count(*)::int from public.sales where not disabled),
   2,
   'exactly two staff accounts are active'
+);
+
+-- At the cap, editing an active account (the users function re-sends disabled = false) still works
+select lives_ok(
+  $$ update public.sales set disabled = false, first_name = 'Edited' where user_id = '00000000-0000-4000-8000-000000000102' $$,
+  'saving an active account with disabled = false is accepted at the cap'
+);
+select lives_ok(
+  $$ update public.sales set disabled = true where user_id = '00000000-0000-4000-8000-000000000101' $$,
+  'disabling an account is always accepted'
 );
 
 select * from finish();

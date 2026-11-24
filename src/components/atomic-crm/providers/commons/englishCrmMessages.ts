@@ -578,6 +578,8 @@ export const englishCrmMessages = {
     profile: {
       add_secondary_email: "Add an email",
       email_taken: "%{email} is already used by another user",
+      staff_cap_reached:
+        "The MVP allows two active staff accounts (Owner and Counsellor); no Teacher accounts until role-based access (F-101) passes (ADR-A14). Disable another account first.",
       no_secondary_emails: "None",
       secondary_email_invalid: "%{email} is not a valid email address",
       secondary_email_is_primary: "%{email} is already your main address",
