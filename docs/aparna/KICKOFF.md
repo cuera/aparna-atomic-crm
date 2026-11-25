@@ -22,7 +22,7 @@ Do these steps in this exact order (ADR-A19).
 4. Plan: free is fine while building with synthetic data. **Upgrade to Pro before the pilot** (real families' data: backups, no auto-pause).
 5. Copy: Project URL, publishable key, project ref (Settings → General). Account → Access Tokens → create one for GitHub Actions.
 6. **Only now**, in GitHub → Settings → Secrets and variables → Actions, add the repository secrets used by the `Deploy` workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID` (project ref), `SUPABASE_URL`, `SB_PUBLISHABLE_KEY`. The next green `Check` on `main` runs `Deploy`, which pushes the schema.
-7. Authentication → URL Configuration: Site URL = your Vercel production URL (after A3); add it to Redirect URLs.
+7. Authentication → URL Configuration (after A3): Site URL = `https://<production domain>/auth-callback.html` (the frontend's auth callback, not the bare domain; upstream `doc/src/content/docs/developers/supabase-configuration.mdx`), and add the same URL to Redirect URLs. With the bare domain, invitation links break.
 
 ### A3. Vercel
 1. Add New → Project → import `cuera/aparna-atomic-crm`. Production branch: `main`.

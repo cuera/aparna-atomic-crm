@@ -118,7 +118,7 @@
         "a failing test fails the PR"
       ],
       "verify": "manual:progress.md links a Check run on a throwaway commit where a deliberately failing pgTAP test turned Check red, and the green run after it was reverted",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-106",
