@@ -1,6 +1,11 @@
 import type { CrmMessages } from "./englishCrmMessages";
 
 export const frenchCrmMessages = {
+  ra: {
+    page: {
+      dashboard: "Aujourd'hui",
+    },
+  },
   resources: {
     companies: {
       name: "Entreprise |||| Entreprises",
@@ -581,6 +586,8 @@ export const frenchCrmMessages = {
     profile: {
       add_secondary_email: "Ajouter un e-mail",
       email_taken: "%{email} est déjà utilisée par un autre utilisateur",
+      staff_cap_reached:
+        "Le MVP autorise deux comptes actifs (Owner et Counsellor) ; pas de compte Teacher avant le contrôle d'accès par rôle (F-101, ADR-A14). Désactivez d'abord un autre compte.",
       no_secondary_emails: "Aucun",
       secondary_email_invalid: "%{email} n'est pas une adresse e-mail valide",
       secondary_email_is_primary: "%{email} est déjà votre adresse principale",

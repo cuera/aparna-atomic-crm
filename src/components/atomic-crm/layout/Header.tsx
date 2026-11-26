@@ -65,13 +65,7 @@ const Header = () => {
                     to="/contacts"
                     isActive={currentPath === "/contacts"}
                   />
-                  <NavigationTab
-                    label={translate("resources.companies.name", {
-                      smart_count: 2,
-                    })}
-                    to="/companies"
-                    isActive={currentPath === "/companies"}
-                  />
+                  {/* Companies is hidden from the menu, not deleted (ADR-A03, M-102) */}
                   <NavigationTab
                     label={translate("resources.deals.name", {
                       smart_count: 2,

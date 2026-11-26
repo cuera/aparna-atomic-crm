@@ -31,15 +31,17 @@ test.describe("global search", () => {
 
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await page
-      .getByPlaceholder("Search contacts, companies, deals, tasks and notes...")
+      .getByPlaceholder(
+        "Search parents, companies, admissions, tasks and notes...",
+      )
       .fill("zebulon");
 
-    const contacts = page.getByRole("group", { name: "Contacts" });
+    const contacts = page.getByRole("group", { name: "Parents" });
     await expect(contacts.getByRole("option")).toHaveCount(1);
     await expect(contacts.getByRole("option")).toContainText("Zebulon Durand");
 
     // 3 notes, then the rest of the 10 fetched once expanded
-    const notes = page.getByRole("group", { name: "Contact notes" });
+    const notes = page.getByRole("group", { name: "Parent notes" });
     await expect(notes.getByRole("option")).toHaveCount(4);
     await notes.getByRole("option", { name: "Show more" }).click();
     await expect(notes.getByRole("option")).toHaveCount(10);

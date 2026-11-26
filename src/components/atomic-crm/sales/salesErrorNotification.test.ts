@@ -2,6 +2,19 @@ import { describe, it, expect } from "vitest";
 import { getSalesErrorNotification } from "./salesErrorNotification";
 
 describe("getSalesErrorNotification", () => {
+  it("explains the two-staff cap when re-enabling a third account is refused", () => {
+    expect(
+      getSalesErrorNotification(
+        Object.assign(new Error("MVP allows two staff accounts"), {
+          code: "staff_cap_reached",
+        }),
+      ),
+    ).toEqual({
+      message: "crm.profile.staff_cap_reached",
+      args: { email: "" },
+    });
+  });
+
   it("names the address rejected as already taken", () => {
     expect(
       getSalesErrorNotification(

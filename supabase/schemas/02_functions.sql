@@ -53,6 +53,34 @@ CREATE OR REPLACE FUNCTION "public"."cleanup_note_attachments"() RETURNS "trigge
     END;
     $$;
 
+CREATE OR REPLACE FUNCTION "public"."enforce_mvp_two_staff_cap"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  active_count int;
+begin
+  -- Only a row that becomes active can exceed the cap (ADR-A14, M-108)
+  if new.disabled or (tg_op = 'UPDATE' and not old.disabled) then
+    return new;
+  end if;
+
+  -- Serialise concurrent invitations and re-enables, so two of them cannot both see a free slot
+  perform pg_advisory_xact_lock(hashtext('sales_mvp_two_staff_cap'));
+
+  -- SECURITY DEFINER: the count must see every row, whatever the caller's RLS
+  select count(*) into active_count
+  from public.sales
+  where not disabled and id <> new.id;
+
+  if active_count >= 2 then
+    raise exception 'MVP allows two staff accounts (Owner and Counsellor); no Teacher accounts until role-based access (F-101) passes (ADR-A14)';
+  end if;
+
+  return new;
+end;
+$$;
+
 CREATE OR REPLACE FUNCTION "public"."get_avatar_for_email"("email" "text") RETURNS "text"
     LANGUAGE "plpgsql"
     SET "search_path" TO 'public'
@@ -247,6 +275,25 @@ begin
     return new;
 end;$$;
 
+CREATE OR REPLACE FUNCTION "public"."handle_deal_mvp_fields"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+begin
+  -- The hidden deals.name follows the child's name (ADR-A12: one admission = one child)
+  new.name := coalesce(nullif(btrim(new.child_name), ''), new.name);
+
+  if tg_op = 'INSERT' or new.stage is distinct from old.stage then
+    new.stage_changed_at := now();
+    if new.stage = 'enrolled' then
+      new.enrolled_at := now();
+    end if;
+  end if;
+
+  return new;
+end;
+$$;
+
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -308,6 +355,38 @@ begin
   return exists (
     select 1 from public.sales where user_id = auth.uid() and administrator = true
   );
+end;
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."mark_fee_paid"("p_deal_id" bigint, "p_shown_due" "date") RETURNS boolean
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+declare
+  new_due date;
+begin
+  -- Compare-and-set (M-109): only a caller who saw the current due date advances it.
+  -- A concurrent second call waits on the row lock, re-checks next_fee_due and updates nothing.
+  update public.deals
+  set next_fee_due = (next_fee_due + case fee_period
+    when 'monthly' then interval '1 month'
+    when 'quarterly' then interval '3 months'
+  end)::date
+  where id = p_deal_id and next_fee_due = p_shown_due
+  returning next_fee_due into new_due;
+
+  if not found then
+    return false;
+  end if;
+
+  if new_due is null then
+    raise exception 'Admission % has a next fee due date but no fee period', p_deal_id;
+  end if;
+
+  insert into public.deal_notes (deal_id, text)
+  values (p_deal_id, format('Fee paid: due %s, next due %s', p_shown_due, new_due));
+
+  return true;
 end;
 $$;
 
@@ -437,6 +516,9 @@ BEGIN
     )
   );
 
+  -- Free the loser's phone_e164 first, or the partial unique index rejects the winner's update
+  UPDATE contacts SET phone_e164 = NULL WHERE id = loser_id;
+
   -- 5. Update winner with merged data
   UPDATE contacts SET
     avatar = COALESCE(winner_contact.avatar, loser_contact.avatar),
@@ -453,7 +535,12 @@ BEGIN
     first_seen = LEAST(COALESCE(winner_contact.first_seen, loser_contact.first_seen), COALESCE(loser_contact.first_seen, winner_contact.first_seen)),
     last_seen = GREATEST(COALESCE(winner_contact.last_seen, loser_contact.last_seen), COALESCE(loser_contact.last_seen, winner_contact.last_seen)),
     sales_id = COALESCE(winner_contact.sales_id, loser_contact.sales_id),
-    tags = merged_tags
+    tags = merged_tags,
+    country = COALESCE(winner_contact.country, loser_contact.country),
+    timezone = COALESCE(winner_contact.timezone, loser_contact.timezone),
+    phone_e164 = COALESCE(winner_contact.phone_e164, loser_contact.phone_e164),
+    -- An opt-out on either side survives the merge
+    whatsapp_opt_in = winner_contact.whatsapp_opt_in AND loser_contact.whatsapp_opt_in
   WHERE id = winner_id;
 
   -- 6. Delete loser contact

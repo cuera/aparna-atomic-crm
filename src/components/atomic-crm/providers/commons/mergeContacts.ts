@@ -135,6 +135,14 @@ export const mergeContacts = async (
         winnerContact.tags || [],
         loserContact.tags || [],
       ),
+      // MVP parent fields: same rules as the SQL merge_contacts (02_functions.sql)
+      country: winnerContact.country ?? loserContact.country,
+      timezone: winnerContact.timezone ?? loserContact.timezone,
+      phone_e164: winnerContact.phone_e164 ?? loserContact.phone_e164,
+      // An opt-out on either side survives the merge
+      whatsapp_opt_in:
+        (winnerContact.whatsapp_opt_in ?? true) &&
+        (loserContact.whatsapp_opt_in ?? true),
     },
     previousData: winnerContact,
   });

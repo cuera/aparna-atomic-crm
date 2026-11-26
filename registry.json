@@ -612,6 +612,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/deals/admissionExporter.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/deals/OnlyMineInput.tsx",
           "type": "registry:component"
         },
@@ -761,6 +765,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/contactModel.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/contactExporter.ts",
           "type": "registry:component"
         },
         {

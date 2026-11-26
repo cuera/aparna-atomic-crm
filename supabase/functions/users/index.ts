@@ -9,13 +9,31 @@ import {
   MAX_SECONDARY_EMAILS,
   normalizeSecondaryEmails,
 } from "./secondaryEmails.ts";
+import {
+  applyStaffAccess,
+  isStaffCapError,
+  STAFF_CAP_ERROR_CODE,
+} from "./staffAccess.ts";
 
+// Supabase calls return { error } instead of throwing: a refused write (e.g. the
+// two-staff cap trigger, ADR-A14) must never be ignored.
 async function updateSaleDisabled(user_id: string, disabled: boolean) {
-  return await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from("sales")
     .update({ disabled: disabled ?? false })
     .eq("user_id", user_id);
+  if (error) throw error;
 }
+
+async function updateLoginBan(user_id: string, banned: boolean) {
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+    ban_duration: banned ? "87600h" : "none",
+  });
+  if (error) throw error;
+}
+
+const staffCapResponse = (error: { message: string }) =>
+  createErrorResponse(409, error.message, { code: STAFF_CAP_ERROR_CODE });
 
 async function updateSaleAdministrator(
   user_id: string,
@@ -196,13 +214,21 @@ async function inviteUser(req: Request, currentUserSale: any) {
         );
       }
 
-      const sale = await createSale(user.id, {
-        email,
-        password,
-        first_name,
-        last_name,
-        disabled,
-        administrator,
+      // The sales row is created and the login ban set together, restrictive step first
+      const userId = user.id;
+      let sale: unknown;
+      await applyStaffAccess(disabled ?? false, {
+        setSaleDisabled: async (value) => {
+          sale = await createSale(userId, {
+            email,
+            password,
+            first_name,
+            last_name,
+            disabled: value,
+            administrator,
+          });
+        },
+        setLoginBan: (value) => updateLoginBan(userId, value),
       });
 
       return new Response(
@@ -214,6 +240,7 @@ async function inviteUser(req: Request, currentUserSale: any) {
         },
       );
     } catch (error) {
+      if (isStaffCapError(error)) return staffCapResponse(error);
       return createErrorResponse(
         (error as any).status ?? 500,
         (error as Error).message,
@@ -233,6 +260,19 @@ async function inviteUser(req: Request, currentUserSale: any) {
       console.error("Error inviting user: undefined user");
       return createErrorResponse(500, "Internal Server Error");
     }
+    // handle_new_user created an active sales row. An invite with "Disabled" on bans the
+    // login before marking the row disabled, and before any email goes out.
+    try {
+      const userId = data.user.id;
+      await applyStaffAccess(disabled ?? false, {
+        setSaleDisabled: (value) => updateSaleDisabled(userId, value),
+        setLoginBan: (value) => updateLoginBan(userId, value),
+      });
+    } catch (e) {
+      if (isStaffCapError(e)) return staffCapResponse(e);
+      console.error("Error setting staff access:", e);
+      return createErrorResponse(500, "Internal Server Error");
+    }
     const { error: emailError } =
       await supabaseAdmin.auth.admin.inviteUserByEmail(email);
 
@@ -243,7 +283,6 @@ async function inviteUser(req: Request, currentUserSale: any) {
   }
 
   try {
-    await updateSaleDisabled(user.id, disabled);
     const sale = await updateSaleAdministrator(user.id, administrator);
 
     return new Response(
@@ -255,6 +294,7 @@ async function inviteUser(req: Request, currentUserSale: any) {
       },
     );
   } catch (e) {
+    if (isStaffCapError(e)) return staffCapResponse(e);
     console.error("Error patching sale:", e);
     return createErrorResponse(500, "Internal Server Error");
   }
@@ -355,9 +395,6 @@ async function patchUser(req: Request, currentUserSale: any) {
   const { data, error: userError } =
     await supabaseAdmin.auth.admin.updateUserById(sale.user_id, {
       email,
-      ...(currentUserSale.administrator && {
-        ban_duration: disabled ? "87600h" : "none",
-      }),
       user_metadata: { first_name, last_name },
     });
 
@@ -400,8 +437,21 @@ async function patchUser(req: Request, currentUserSale: any) {
   }
 
   try {
-    await updateSaleDisabled(data.user.id, disabled);
-    const sale = await updateSaleAdministrator(data.user.id, administrator);
+    // The login ban and sales.disabled change together, restrictive step first (staffAccess.ts)
+    // administrator first: it cannot hit the cap, so a later failure never reports
+    // an access change that was already saved
+    const userId = data.user.id;
+    await updateSaleAdministrator(userId, administrator);
+    await applyStaffAccess(disabled ?? false, {
+      setSaleDisabled: (value) => updateSaleDisabled(userId, value),
+      setLoginBan: (value) => updateLoginBan(userId, value),
+    });
+    const { data: sale, error: saleError } = await supabaseAdmin
+      .from("sales")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+    if (saleError) throw saleError;
     return new Response(
       JSON.stringify({
         data: sale,
@@ -414,6 +464,7 @@ async function patchUser(req: Request, currentUserSale: any) {
       },
     );
   } catch (e) {
+    if (isStaffCapError(e)) return staffCapResponse(e);
     console.error("Error patching sale:", e);
     return createErrorResponse(500, "Internal Server Error");
   }

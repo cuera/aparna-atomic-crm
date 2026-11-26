@@ -23,10 +23,10 @@ describe("ContactList", () => {
   it("renders an invite to create the first contact when the app is empty", async () => {
     const screen = await render(<DesktopEmpty />);
     await expect
-      .element(screen.getByRole("heading", { name: "No contacts found" }))
+      .element(screen.getByRole("heading", { name: "No parents found" }))
       .toBeInTheDocument();
     await expect
-      .element(screen.getByText("It seems your contact list is empty."))
+      .element(screen.getByText("It seems your parent list is empty."))
       .toBeVisible();
   });
 
@@ -36,7 +36,7 @@ describe("ContactList", () => {
     await expect.element(screen.getByText("Ada Lovelace")).toBeVisible();
     await expect.element(screen.getByText("Grace Hopper")).toBeVisible();
     await expect
-      .element(screen.getByRole("heading", { name: "No contacts found" }))
+      .element(screen.getByRole("heading", { name: "No parents found" }))
       .not.toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: "VIP" }).click();
 
     await expect
-      .element(screen.getByText("Tag added to 1 contact"))
+      .element(screen.getByText("Tag added to 1 parent"))
       .toBeInTheDocument();
     await expect
       .poll(() => screen.getByText("VIP").all().length)
@@ -116,7 +116,7 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: /^tag$/i }).click();
     await screen.getByRole("button", { name: "VIP" }).click();
     await expect
-      .element(screen.getByText("Tag added to 1 contact"))
+      .element(screen.getByText("Tag added to 1 parent"))
       .toBeInTheDocument();
     await screen.getByRole("button", { name: /close/i }).click();
 
@@ -126,7 +126,7 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: "VIP" }).click();
 
     await expect
-      .element(screen.getByText("Tag removed from 2 contacts"))
+      .element(screen.getByText("Tag removed from 2 parents"))
       .toBeInTheDocument();
     await expect
       .poll(() => screen.getByRole("row").getByText("VIP").all().length)
@@ -151,7 +151,7 @@ describe("ContactList", () => {
     await expect
       .element(
         screen.getByText(
-          "Create a new tag and apply it to the selected contacts.",
+          "Create a new tag and apply it to the selected parents.",
         ),
       )
       .toBeVisible();
@@ -160,7 +160,7 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: /^Save$/ }).click();
 
     await expect
-      .element(screen.getByText("Tag added to 2 contacts"))
+      .element(screen.getByText("Tag added to 2 parents"))
       .toBeInTheDocument();
     await expect.element(screen.getByText("Prospect").first()).toBeVisible();
     // close the notification
@@ -173,7 +173,7 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: "Import CSV" }).click();
 
     await expect
-      .element(screen.getByRole("heading", { name: "Import contacts" }))
+      .element(screen.getByRole("heading", { name: "Import parents" }))
       .toBeVisible();
     await expect
       .element(screen.getByLabelText("Resource"))

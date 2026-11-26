@@ -8,7 +8,9 @@
 
 ### A1. GitHub
 1. Open https://github.com/cuera/aparna-atomic-crm/pull/new/plan/aparna-crm-p0 → create the PR → merge it into `main`. Every session starts from `main`.
-2. Do **not** add any secret yet. The repository secrets are added in A2 step 6, only after Supabase sign-ups are off (R-13, ADR-A19).
+2. Enable Actions on the fork (forks start with Actions off): Actions tab -> enable.
+3. Protect main: Settings -> Branches -> classic rule for main -> require a pull request (approvals 0) and the 5 Check jobs.
+4. Do **not** add any secret yet. The repository secrets are added in A2 step 6, only after Supabase sign-ups are off (R-13, ADR-A19).
 
 ### A2. Supabase (in the developer's account during build and test, ADR-A20)
 
@@ -20,7 +22,7 @@ Do these steps in this exact order (ADR-A19).
 4. Plan: free is fine while building with synthetic data. **Upgrade to Pro before the pilot** (real families' data: backups, no auto-pause).
 5. Copy: Project URL, publishable key, project ref (Settings → General). Account → Access Tokens → create one for GitHub Actions.
 6. **Only now**, in GitHub → Settings → Secrets and variables → Actions, add the repository secrets used by the `Deploy` workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID` (project ref), `SUPABASE_URL`, `SB_PUBLISHABLE_KEY`. The next green `Check` on `main` runs `Deploy`, which pushes the schema.
-7. Authentication → URL Configuration: Site URL = your Vercel production URL (after A3); add it to Redirect URLs.
+7. Authentication → URL Configuration (after A3): Site URL = `https://<production domain>/auth-callback.html` (the frontend's auth callback, not the bare domain; upstream `doc/src/content/docs/developers/supabase-configuration.mdx`), and add the same URL to Redirect URLs. With the bare domain, invitation links break.
 
 ### A3. Vercel
 1. Add New → Project → import `cuera/aparna-atomic-crm`. Production branch: `main`.
@@ -116,7 +118,7 @@ Slice M0. No product code.
    f) .github/workflows/check.yml e2e job starts Supabase, so an `npx supabase test db` step can run there too;
    g) .github/workflows/deploy.yml pushes migrations with the 5 secrets; which of its other jobs need extra setup.
 3. Dispatch the gate-reviewer agent, MODE gate, gate "MVP-A", files: docs/aparna/MVP.md, TRANSITION.md,
-   decisions.md (ADR-A11..A16), features.json (M- features), CLAUDE-aparna.md, .claude/skills/aparna-loop/SKILL.md.
+   decisions.md (ADR-A11..A16, A18..A20), features.json (M- features), CLAUDE-aparna.md, .claude/skills/aparna-loop/SKILL.md.
    Do not review it yourself; relay its scorecard verbatim.
 4. Record results in progress.md; wrong assumptions and findings -> problems.md with proposed fixes.
    Do not edit MVP.md, TRANSITION.md or decisions.md yet.
@@ -124,7 +126,7 @@ Slice M0. No product code.
    wrong assumptions, score, proposed fixes, decisions needing my go. Then stop.
 ```
 
-After M0 you reply in the same session: `Gate MVP-A: go. Apply the fixes I approved, mark ADR-A11..A16 Accepted, record the gate in progress.md, update the PR.` Then merge it.
+After M0 you reply in the same session: `Gate MVP-A: go. Apply the fixes I approved, mark ADR-A11..A16, A18..A20 Accepted, record the gate in progress.md, update the PR.` Then merge it.
 
 ### M1 — Foundation (schema frozen when merged)
 

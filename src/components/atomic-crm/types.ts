@@ -103,6 +103,11 @@ export type Contact = {
   phone_jsonb: PhoneNumberAndType[];
   nb_tasks?: number;
   company_name?: string;
+  // MVP parent fields (MVP.md section 4)
+  country?: string | null;
+  timezone?: string | null;
+  phone_e164?: string | null;
+  whatsapp_opt_in?: boolean;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {
@@ -128,6 +133,21 @@ export type Deal = {
   expected_closing_date: string | null;
   sales_id: Identifier;
   index: number;
+  // MVP admission fields (MVP.md section 4); money in paise
+  child_name?: string | null;
+  child_grade?: string | null;
+  board?: string | null;
+  course?: string | null;
+  source?: string | null;
+  next_action_at?: string | null;
+  lost_reason?: string | null;
+  trial_at?: string | null;
+  first_response_at?: string | null;
+  enrolled_at?: string | null;
+  stage_changed_at?: string | null;
+  fee_amount_paise?: number | null;
+  fee_period?: "monthly" | "quarterly" | null;
+  next_fee_due?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type DealNote = {

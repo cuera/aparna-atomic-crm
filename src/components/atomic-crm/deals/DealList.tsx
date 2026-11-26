@@ -20,6 +20,7 @@ import { DataImportButton } from "../dataImport/DataImportButton";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { TopToolbar } from "../layout/TopToolbar";
 import { AccountManagerInput } from "../sales/AccountManagerInput";
+import { admissionExporter } from "./admissionExporter";
 import { DealArchivedList } from "./DealArchivedList";
 import { DealCreate } from "./DealCreate";
 import { DealEdit } from "./DealEdit";
@@ -87,6 +88,7 @@ const DealList = () => {
       filters={dealFilters}
       actions={<DealActions />}
       pagination={null}
+      exporter={admissionExporter}
     >
       <DealLayout />
     </List>
@@ -128,7 +130,7 @@ const DealActions = () => (
   <TopToolbar>
     <FilterButton />
     <DataImportButton resource="deals" />
-    <ExportButton />
+    <ExportButton exporter={admissionExporter} />
     <CreateButton label="resources.deals.action.new" />
   </TopToolbar>
 );

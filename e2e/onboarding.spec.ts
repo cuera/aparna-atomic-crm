@@ -16,12 +16,12 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await expect(page.getByText("What's next?")).toBeVisible();
   await expect(page.getByText("1/3 done")).toBeVisible();
   await expect(page.getByText("Install Atomic CRM")).toBeVisible();
-  await expect(page.getByText("Add your first contact")).toBeVisible();
+  await expect(page.getByText("Add your first parent")).toBeVisible();
   await expect(page.getByText("Add your first note")).toBeVisible();
   await expect(page.getByRole("button", { name: "Import data" })).toBeVisible();
 
   await page
-    .getByRole(isMobile ? "button" : "link", { name: "Add contact" })
+    .getByRole(isMobile ? "button" : "link", { name: "Add parent" })
     .click();
   await page.waitForLoadState("networkidle");
   await page.getByRole("radio", { name: "She/Her" }).click();

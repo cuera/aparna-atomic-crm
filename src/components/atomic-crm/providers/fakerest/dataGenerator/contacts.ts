@@ -21,6 +21,25 @@ const maxContacts = {
   500: 50,
 };
 
+// Most families are in India; some are abroad, with their own time zone (M-106).
+// Picked by id so every generated set has foreign numbers.
+const parentCountries = [
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919810" },
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919710" },
+  {
+    country: "United Arab Emirates",
+    timezone: "Asia/Dubai",
+    prefix: "+971501",
+  },
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919910" },
+  { country: "United Kingdom", timezone: "Europe/London", prefix: "+447700" },
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919610" },
+  { country: "United States", timezone: "America/New_York", prefix: "+12125" },
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919510" },
+  { country: "Singapore", timezone: "Asia/Singapore", prefix: "+6581" },
+  { country: "India", timezone: "Asia/Kolkata", prefix: "+919410" },
+];
+
 const getRandomContactDetailsType = () =>
   random.arrayElement(["Work", "Home", "Other"]) as "Work" | "Home" | "Other";
 
@@ -40,9 +59,13 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
         type: getRandomContactDetailsType(),
       },
     ];
+    const { country, timezone, prefix } =
+      parentCountries[id % parentCountries.length];
+    // Unique per contact, and valid E.164 (the database checks the format)
+    const phone_e164 = prefix + String(id).padStart(6, "0");
     const phone_jsonb = [
       {
-        number: phone.phoneNumber(),
+        number: phone_e164,
         type: getRandomContactDetailsType(),
       },
       {
@@ -96,6 +119,10 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       sales_id: company.sales_id!,
       nb_tasks: 0,
       linkedin_url: null,
+      country,
+      timezone,
+      phone_e164,
+      whatsapp_opt_in: weightedBoolean(95),
     };
   });
 };

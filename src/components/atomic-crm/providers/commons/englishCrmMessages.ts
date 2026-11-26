@@ -1,4 +1,10 @@
 export const englishCrmMessages = {
+  ra: {
+    page: {
+      // MVP: the landing page is the Today list (M3 replaces the dashboard content)
+      dashboard: "Today",
+    },
+  },
   resources: {
     companies: {
       name: "Company |||| Companies",
@@ -9,7 +15,7 @@ export const englishCrmMessages = {
         linkedin_url: "LinkedIn URL",
         phone_number: "Phone number",
         created_at: "Created at",
-        nb_contacts: "Number of contacts",
+        nb_contacts: "Number of parents",
         revenue: "Revenue",
         sector: "Sector",
         size: "Size",
@@ -45,9 +51,9 @@ export const englishCrmMessages = {
       added_on: "Added on %{date}",
       followed_by: "Followed by %{name}",
       followed_by_you: "Followed by you",
-      no_contacts: "No contact",
-      nb_contacts: "%{smart_count} contact |||| %{smart_count} contacts",
-      nb_deals: "%{smart_count} deal |||| %{smart_count} deals",
+      no_contacts: "No parent",
+      nb_contacts: "%{smart_count} parent |||| %{smart_count} parents",
+      nb_deals: "%{smart_count} admission |||| %{smart_count} admissions",
       sizes: {
         one_employee: "1 employee",
         two_to_nine_employees: "2-9 employees",
@@ -62,8 +68,8 @@ export const englishCrmMessages = {
       },
     },
     contacts: {
-      name: "Contact |||| Contacts",
-      forcedCaseName: "Contact",
+      name: "Parent |||| Parents",
+      forcedCaseName: "Parent",
       field_categories: {
         background_info: "Background info",
         identity: "Identity",
@@ -87,17 +93,17 @@ export const englishCrmMessages = {
         sales_id: "Account manager",
       },
       action: {
-        add: "Add contact",
-        add_first: "Add your first contact",
-        create: "Create contact",
-        edit: "Edit contact",
+        add: "Add parent",
+        add_first: "Add your first parent",
+        create: "Create parent",
+        edit: "Edit parent",
         export_vcard: "Export to vCard",
-        new: "New Contact",
-        show: "Show contact",
+        new: "New Parent",
+        show: "Show parent",
       },
       autocomplete: {
         create_item: "Create %{item}",
-        create_label: "Start typing to create a new contact",
+        create_label: "Start typing to create a new parent",
       },
       background: {
         last_activity_on: "Last activity on %{date}",
@@ -109,11 +115,11 @@ export const englishCrmMessages = {
       position_at: "%{title} at",
       position_at_company: "%{title} at %{company}",
       empty: {
-        description: "It seems your contact list is empty.",
-        title: "No contacts found",
+        description: "It seems your parent list is empty.",
+        title: "No parents found",
       },
       import: {
-        title: "Import contacts",
+        title: "Import parents",
       },
       inputs: {
         genders: {
@@ -128,40 +134,40 @@ export const englishCrmMessages = {
         },
       },
       list: {
-        error_loading: "Error loading contacts",
+        error_loading: "Error loading parents",
       },
       show: {
-        error_loading: "Error loading contact",
+        error_loading: "Error loading parent",
       },
       bulk_tag: {
         action: "Tag",
         back: "Back to tags",
         create_description:
-          "Create a new tag and apply it to the selected contacts.",
+          "Create a new tag and apply it to the selected parents.",
         description:
-          "Choose an existing tag or create a new one for the selected contacts.",
-        empty: "No tags yet. Create one to tag the selected contacts.",
-        error: "Failed to add tag to contacts",
+          "Choose an existing tag or create a new one for the selected parents.",
+        empty: "No tags yet. Create one to tag the selected parents.",
+        error: "Failed to add tag to parents",
         removed:
-          "Tag removed from %{smart_count} contact |||| Tag removed from %{smart_count} contacts",
+          "Tag removed from %{smart_count} parent |||| Tag removed from %{smart_count} parents",
         success:
-          "Tag added to %{smart_count} contact |||| Tag added to %{smart_count} contacts",
-        title: "Add tag to contacts",
+          "Tag added to %{smart_count} parent |||| Tag added to %{smart_count} parents",
+        title: "Add tag to parents",
       },
       merge: {
-        action: "Merge with another contact",
-        confirm: "Merge Contacts",
-        current_contact: "Current Contact (will be deleted)",
-        description: "Merge this contact with another one.",
-        error: "Failed to merge contacts",
+        action: "Merge with another parent",
+        confirm: "Merge Parents",
+        current_contact: "Current Parent (will be deleted)",
+        description: "Merge this parent with another one.",
+        error: "Failed to merge parents",
         merging: "Merging...",
         no_additional_data: "No additional data to merge",
-        select_target: "Please select a contact to merge with",
-        success: "Contacts merged successfully",
-        target_contact: "Target Contact (will be kept)",
-        title: "Merge Contact",
+        select_target: "Please select a parent to merge with",
+        success: "Parents merged successfully",
+        target_contact: "Target Parent (will be kept)",
+        title: "Merge Parent",
         warning_description:
-          "All data will be transferred to the second contact. This action cannot be undone.",
+          "All data will be transferred to the second parent. This action cannot be undone.",
         warning_title: "Warning: Destructive Operation",
         what_will_be_merged: "What will be merged:",
       },
@@ -178,58 +184,58 @@ export const englishCrmMessages = {
       },
       hot: {
         empty_change_status:
-          'Change the status of a contact by adding a note to that contact and clicking on "show options".',
-        empty_hint: 'Contacts with a "hot" status will appear here.',
-        title: "Hot Contacts",
+          'Change the status of a parent by adding a note to that parent and clicking on "show options".',
+        empty_hint: 'Parents with a "hot" status will appear here.',
+        title: "Hot Parents",
       },
     },
     deals: {
-      name: "Deal |||| Deals",
+      name: "Admission |||| Admissions",
       fields: {
         name: "Name",
         description: "Description",
         company_id: "Company",
-        contact_ids: "Contacts",
+        contact_ids: "Parents",
         categories: "Categories",
         amount: "Budget",
         expected_closing_date: "Expected closing date",
         stage: "Stage",
       },
       action: {
-        back_to_deal: "Back to deal",
-        create: "Create deal",
-        new: "New Deal",
+        back_to_deal: "Back to admission",
+        create: "Create admission",
+        new: "New Admission",
       },
       field_categories: {
         misc: "Misc",
       },
       filters: {
-        only_mine: "Only deals I manage",
+        only_mine: "Only admissions I manage",
       },
       archived: {
         action: "Archive",
-        error: "Error: deal not archived",
-        list_title: "Archived Deals",
-        success: "Deal archived",
-        title: "Archived Deal",
-        view: "View archived deals",
+        error: "Error: admission not archived",
+        list_title: "Archived Admissions",
+        success: "Admission archived",
+        title: "Archived Admission",
+        view: "View archived admissions",
       },
       inputs: {
         linked_to: "Linked to",
       },
       unarchived: {
         action: "Send back to the board",
-        error: "Error: deal not unarchived",
-        success: "Deal unarchived",
+        error: "Error: admission not unarchived",
+        success: "Admission unarchived",
       },
-      updated: "Deal updated",
+      updated: "Admission updated",
       empty: {
-        before_create: "before creating a deal.",
-        description: "It seems your deal list is empty.",
-        title: "No deals found",
+        before_create: "before creating an admission.",
+        description: "It seems your admission list is empty.",
+        title: "No admissions found",
       },
       import: {
-        title: "Import deals",
+        title: "Import admissions",
       },
       invalid_date: "Invalid date",
       no_closing_date: "No closing date",
@@ -241,8 +247,8 @@ export const englishCrmMessages = {
         status: "Status",
         date: "Date",
         attachments: "Attachments",
-        contact_id: "Contact",
-        deal_id: "Deal",
+        contact_id: "Parent",
+        deal_id: "Admission",
       },
       action: {
         add: "Add note",
@@ -268,7 +274,7 @@ export const englishCrmMessages = {
       },
       note_for_contact: "Note for %{name}",
       stepper: {
-        hint: "Go to a contact page and add a note",
+        hint: "Go to a parent page and add a note",
       },
       added: "Note added",
       inputs: {
@@ -317,7 +323,7 @@ export const englishCrmMessages = {
         text: "Description",
         due_date: "Due date",
         type: "Type",
-        contact_id: "Contact",
+        contact_id: "Parent",
         due_short: "due",
       },
       action: {
@@ -341,7 +347,7 @@ export const englishCrmMessages = {
         edit_for: "Edit task for %{name}",
       },
       empty: "No tasks yet",
-      empty_list_hint: "Tasks added to your contacts will appear here.",
+      empty_list_hint: "Tasks added to your parents will appear here.",
       filters: {
         later: "Later",
         overdue: "Overdue",
@@ -420,17 +426,17 @@ export const englishCrmMessages = {
       you_added_contact: "You added",
       added_note: "%{name} added a note about",
       you_added_note: "You added a note about",
-      added_note_about_deal: "%{name} added a note about deal",
-      you_added_note_about_deal: "You added a note about deal",
-      added_deal: "%{name} added deal",
-      you_added_deal: "You added deal",
+      added_note_about_deal: "%{name} added a note about admission",
+      you_added_note_about_deal: "You added a note about admission",
+      added_deal: "%{name} added admission",
+      you_added_deal: "You added admission",
       at_company: "at",
       to: "to",
       load_more: "Load more activity",
     },
     dashboard: {
-      deals_chart: "Upcoming Deal Revenue",
-      deals_pipeline: "Deals Pipeline",
+      deals_chart: "Upcoming Admission Revenue",
+      deals_pipeline: "Admissions Pipeline",
       latest_activity: "Latest Activity",
       latest_activity_error: "Error loading latest activity",
       latest_notes: "My Latest Notes",
@@ -467,7 +473,7 @@ export const englishCrmMessages = {
     },
     search: {
       title: "Search",
-      placeholder: "Search contacts, companies, deals, tasks and notes...",
+      placeholder: "Search parents, companies, admissions, tasks and notes...",
       hint: "Type at least %{min} characters to search",
       recent_contacts: "Recently viewed",
       empty: "No result found",
@@ -475,12 +481,12 @@ export const englishCrmMessages = {
       untitled_result: "(no title)",
       show_more: "Show more",
       groups: {
-        contacts: "Contacts",
+        contacts: "Parents",
         companies: "Companies",
-        deals: "Deals",
+        deals: "Admissions",
         tasks: "Tasks",
-        contact_notes: "Contact notes",
-        deal_notes: "Deal notes",
+        contact_notes: "Parent notes",
+        deal_notes: "Admission notes",
       },
     },
     image_editor: {
@@ -501,7 +507,7 @@ export const englishCrmMessages = {
       },
       idle: {
         description_1:
-          "You can import sales, companies, contacts, companies, notes, and tasks.",
+          "You can import sales, companies, parents, companies, notes, and tasks.",
         description_2:
           "Data must be in a JSON file matching the following sample:",
       },
@@ -527,7 +533,7 @@ export const englishCrmMessages = {
         categories: "Categories",
         currency: "Currency",
         pipeline_help:
-          "Select which deal stages should count as pipeline deals.",
+          "Select which admission stages should count as pipeline admissions.",
         pipeline_statuses: "Pipeline Statuses",
         stages: "Stages",
       },
@@ -551,7 +557,7 @@ export const englishCrmMessages = {
       validation: {
         duplicate: "Duplicate %{display_name}: %{items}",
         in_use:
-          "Cannot remove %{display_name} that are still used by deals: %{items}",
+          "Cannot remove %{display_name} that are still used by admissions: %{items}",
         validating: "Validating\u2026",
         entities: {
           categories: "categories",
@@ -572,6 +578,8 @@ export const englishCrmMessages = {
     profile: {
       add_secondary_email: "Add an email",
       email_taken: "%{email} is already used by another user",
+      staff_cap_reached:
+        "The MVP allows two active staff accounts (Owner and Counsellor); no Teacher accounts until role-based access (F-101) passes (ADR-A14). Disable another account first.",
       no_secondary_emails: "None",
       secondary_email_invalid: "%{email} is not a valid email address",
       secondary_email_is_primary: "%{email} is already your main address",
@@ -582,7 +590,7 @@ export const englishCrmMessages = {
         "Other addresses you send emails from. Leave one empty to remove it.",
       inbound: {
         description:
-          "You can start sending emails to your server's inbound email address, e.g. by adding it to the %{field} field. Atomic CRM will process the emails and add notes to the corresponding contacts.",
+          "You can start sending emails to your server's inbound email address, e.g. by adding it to the %{field} field. Atomic CRM will process the emails and add notes to the corresponding parents.",
         title: "Inbound email",
       },
       mcp: {
