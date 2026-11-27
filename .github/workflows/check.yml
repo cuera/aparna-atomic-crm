@@ -99,6 +99,12 @@ jobs:
       runs-on: ubuntu-latest
       needs: build
       steps:
+      # P-36: keep outbound (ephemeral) ports below the e2e Supabase ports (54340-54349).
+      # The Linux default range (32768-60999) covers them, so a connection made earlier in
+      # the job (npm, image pulls) could hold one and Docker failed to bind it. First step,
+      # so every later connection uses the narrowed range.
+      - name: 🔌 Keep ephemeral ports below the e2e Supabase ports
+        run: sudo sysctl -w net.ipv4.ip_local_port_range="32768 49999"
       - name: 📥 Checkout repo
         uses: actions/checkout@v7
 
