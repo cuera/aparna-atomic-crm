@@ -22,7 +22,7 @@ import {
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/security Security documentation}
  */
 export const LoginPage = (props: { redirectTo?: string }) => {
-  const { darkModeLogo, title } = useConfigurationContext();
+  const { darkModeLogo, lightModeLogo, title } = useConfigurationContext();
   const { redirectTo } = props;
   const [loading, setLoading] = useState(false);
   const hasDisplayedRecoveryNotification = useRef(false);
@@ -88,25 +88,35 @@ export const LoginPage = (props: { redirectTo?: string }) => {
       });
   };
 
+  const brandMark = (
+    <span className="grid size-9 place-items-center rounded-lg bg-blush">
+      <img className="[.light_&]:hidden h-5" src={darkModeLogo} alt={title} />
+      <img className="[.dark_&]:hidden h-5" src={lightModeLogo} alt={title} />
+    </span>
+  );
+
   return (
     <div className="min-h-screen flex">
       <div className="relative grid w-full lg:grid-cols-2">
-        <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-          <div className="absolute inset-0 bg-zinc-900" />
-          <div className="relative z-20 flex items-center text-lg font-medium">
-            <img className="h-6 mr-2" src={darkModeLogo} alt={title} />
+        <div className="hidden h-full flex-col bg-accent p-10 text-blush-foreground lg:flex">
+          <div className="flex items-center gap-3 text-lg font-semibold">
+            {brandMark}
             {title}
           </div>
         </div>
         <div className="flex flex-col justify-center w-full p-4 lg:p-8">
           <div className="w-full space-y-6 lg:mx-auto lg:w-[350px]">
+            <div className="flex items-center justify-center gap-3 text-base font-semibold lg:hidden">
+              {brandMark}
+              {title}
+            </div>
             <div className="text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
                 {translate("ra.auth.sign_in")}
               </h1>
             </div>
             {disableEmailPasswordAuthentication ? null : (
-              <Form className="space-y-8" onSubmit={handleSubmit}>
+              <Form className="space-y-6" onSubmit={handleSubmit}>
                 <TextInput
                   label="ra.auth.email"
                   source="email"
@@ -140,7 +150,7 @@ export const LoginPage = (props: { redirectTo?: string }) => {
             {disableEmailPasswordAuthentication ? null : (
               <Link
                 to={"/forgot-password"}
-                className="block text-sm text-center hover:underline"
+                className="block py-3 text-sm text-center hover:underline"
               >
                 {translate("ra-supabase.auth.forgot_password", {
                   _: "Forgot password?",

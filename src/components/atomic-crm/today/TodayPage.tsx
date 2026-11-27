@@ -46,16 +46,24 @@ const useNow = (): Date => {
   return now;
 };
 
+/** overdue = red (late or error); waiting = amber (a clock is running). */
+type Tone = "overdue" | "waiting";
+
+const toneClass: Record<Tone, string> = {
+  overdue: "text-destructive",
+  waiting: "text-warning",
+};
+
 interface RowProps {
   deal: Deal;
   parent?: Contact;
   detail: ReactNode;
-  isLate?: boolean;
+  tone?: Tone;
   keys?: readonly TemplateKey[];
   extra?: ReactNode;
 }
 
-const TodayRow = ({ deal, parent, detail, isLate, keys, extra }: RowProps) => {
+const TodayRow = ({ deal, parent, detail, tone, keys, extra }: RowProps) => {
   const [searchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
   params.set(ADMISSION_PARAM, String(deal.id));
@@ -64,23 +72,22 @@ const TodayRow = ({ deal, parent, detail, isLate, keys, extra }: RowProps) => {
     : null;
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-2 py-2 border-b last:border-b-0">
+    <li className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b py-3 last:border-b-0">
       <Link
         to={{ search: params.toString() }}
-        className="flex flex-col min-w-0 hover:underline"
+        className="flex min-w-36 flex-1 flex-col gap-0.5 rounded-md hover:underline"
       >
-        <span className="font-medium">{deal.child_name || deal.name}</span>
-        <span
-          className={cn(
-            "text-xs",
-            isLate ? "text-destructive" : "text-muted-foreground",
-          )}
-        >
+        <span className="text-base font-semibold">
+          {deal.child_name || deal.name}
+        </span>
+        <span className="text-sm tabular-nums text-muted-foreground">
           {parentName ? `${parentName} · ` : ""}
-          {detail}
+          <span className={cn(tone && ["font-medium", toneClass[tone]])}>
+            {detail}
+          </span>
         </span>
       </Link>
-      <div className="flex flex-wrap items-start gap-2">
+      <div className="flex shrink-0 flex-wrap items-start justify-end gap-2">
         <WhatsAppSend deal={deal} keys={keys} />
         {extra}
       </div>
@@ -97,14 +104,17 @@ const Section = ({
   count: number;
   children: ReactNode;
 }) => (
-  <Card>
-    <CardContent>
+  <Card className="gap-0 py-4 shadow-xs">
+    <CardContent className="gap-0">
       <section aria-label={title}>
-        <h2 className="font-semibold mb-1">
-          {title} <span className="text-muted-foreground">({count})</span>
+        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold">
+          {title}
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">
+            {count}
+          </span>
         </h2>
         {count === 0 ? (
-          <p className="text-sm text-muted-foreground">Nothing here.</p>
+          <p className="py-2 text-sm text-muted-foreground">Nothing here.</p>
         ) : (
           <ul>{children}</ul>
         )}
@@ -142,7 +152,7 @@ const shownDeals = (sections: TodaySections): Deal[] =>
 
 const TodayHeader = () => (
   <div className="flex flex-wrap items-center justify-between gap-2">
-    <h1 className="text-2xl font-semibold">Today</h1>
+    <h1 className="text-2xl font-semibold tracking-tight">Today</h1>
     {/* M-403: the board's quick-add, reused as is */}
     <QuickAddEnquiryButton />
   </div>
@@ -216,14 +226,14 @@ export const TodayPage = () => {
     <div className="flex flex-col gap-4 mt-1">
       <TodayHeader />
       <ThisWeekStrip deals={deals} now={now} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <Section title="New" count={sections.newEnquiries.length}>
           {sections.newEnquiries.map((deal) => (
             <TodayRow
               key={deal.id}
               deal={deal}
               parent={parentOf(deal)}
-              isLate
+              tone="waiting"
               detail={`waiting ${formatWaiting(deal.created_at, now)}${courseLabel(deal) ? ` · ${courseLabel(deal)}` : ""}`}
               keys={["welcome"]}
             />
@@ -238,7 +248,7 @@ export const TodayPage = () => {
                 key={deal.id}
                 deal={deal}
                 parent={parentOf(deal)}
-                isLate={isOverdue}
+                tone={isOverdue ? "overdue" : undefined}
                 detail={`${isOverdue ? "overdue since" : "due"} ${formatInZone(deal.next_action_at!, IST)}`}
               />
             );
@@ -285,7 +295,7 @@ export const TodayPage = () => {
                 key={deal.id}
                 deal={deal}
                 parent={parentOf(deal)}
-                isLate={isOverdue}
+                tone={isOverdue ? "overdue" : undefined}
                 detail={`${amount}${isOverdue ? "overdue since" : "due"} ${formatDateKey(deal.next_fee_due!)}`}
                 keys={["fee_reminder"]}
                 extra={<MarkFeePaidButton deal={deal} />}
@@ -305,18 +315,20 @@ export const MobileTodayPage = () => {
   return (
     <>
       <MobileHeader>
-        <div className="flex items-center gap-2 text-secondary-foreground no-underline py-3">
-          <img
-            className="[.light_&]:hidden h-6"
-            src={darkModeLogo}
-            alt={title}
-          />
-          <img
-            className="[.dark_&]:hidden h-6"
-            src={lightModeLogo}
-            alt={title}
-          />
-          <span className="text-xl font-semibold">{title}</span>
+        <div className="flex items-center gap-2 py-3 text-foreground no-underline">
+          <span className="grid size-8 place-items-center rounded-lg bg-blush">
+            <img
+              className="[.light_&]:hidden h-5"
+              src={darkModeLogo}
+              alt={title}
+            />
+            <img
+              className="[.dark_&]:hidden h-5"
+              src={lightModeLogo}
+              alt={title}
+            />
+          </span>
+          <span className="text-base font-semibold">{title}</span>
         </div>
       </MobileHeader>
       <MobileContent>

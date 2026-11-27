@@ -189,10 +189,14 @@ const StageDataDialog = ({
   return (
     <Dialog open onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="sm:max-w-md">
-        <DialogTitle>Move to {stageLabel}</DialogTitle>
-        <DialogDescription>
-          {move.deal.child_name || move.deal.name}
-        </DialogDescription>
+        <div className="flex flex-col gap-1">
+          <DialogTitle className="text-xl font-semibold tracking-tight">
+            Move to {stageLabel}
+          </DialogTitle>
+          <DialogDescription className="text-base text-foreground">
+            {move.deal.child_name || move.deal.name}
+          </DialogDescription>
+        </div>
         <Form
           defaultValues={{ ...pick(move.deal, keys), stage }}
           onSubmit={(values: Partial<Deal>) => onConfirm(pick(values, keys))}

@@ -58,32 +58,37 @@ export const DealCardContent = ({
       onClick={handleClick}
     >
       <Card
-        className={`py-3 transition-all duration-200 ${
+        className={cn(
+          "gap-0 py-3 shadow-xs motion-safe:transition-[transform,opacity] motion-safe:duration-150",
           snapshot?.isDragging
-            ? "opacity-90 transform rotate-1 shadow-lg"
-            : "shadow-sm hover:shadow-md"
-        }`}
+            ? "opacity-95 shadow-lg ring-primary/40"
+            : "motion-safe:hover:-translate-y-0.5 hover:shadow-md",
+        )}
       >
-        <CardContent className="px-3 flex flex-col gap-1">
-          <p className="text-sm font-medium">{deal.child_name || deal.name}</p>
+        <CardContent className="flex flex-col gap-1 px-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+            <p className="min-w-0 text-sm font-semibold">
+              {deal.child_name || deal.name}
+            </p>
+            {days != null && (
+              <p className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                {days} {days === 1 ? "day" : "days"} in stage
+              </p>
+            )}
+          </div>
           {course && <p className="text-xs text-muted-foreground">{course}</p>}
           {showNextAction && (
             <p
               className={cn(
-                "text-xs",
+                "text-xs tabular-nums",
                 isOverdue
-                  ? "text-destructive font-medium"
+                  ? "font-medium text-destructive"
                   : "text-muted-foreground",
               )}
               data-overdue={isOverdue}
             >
               Next: {formatInZone(deal.next_action_at!, IST)}
               {isOverdue && " (overdue)"}
-            </p>
-          )}
-          {days != null && (
-            <p className="text-xs text-muted-foreground">
-              {days} {days === 1 ? "day" : "days"} in stage
             </p>
           )}
         </CardContent>

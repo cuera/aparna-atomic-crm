@@ -5,8 +5,25 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Design tokens (M5b). Calm, premium, minimal: a neutral cool-slate base, one
+ * blue primary (buttons, links, focus), a soft blush as a quiet accent (selected
+ * states, the brand mark), and semantic status colours that never borrow the
+ * blush: red = overdue or error, amber = waiting, green = done.
+ * Neutrals sit at hue 262, never in the violet band (270 to 330).
+ * Every text and control pair is at least WCAG AA: 4.5:1 for text, 3:1 for
+ * control borders, the focus ring and filled UI parts (ratios in the M5b PR).
+ */
 @theme inline {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Type scale 13 / 14 / 16 / 20 / 24 (text-xs, -sm, -base, -xl, -2xl). */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: calc(1.125 / 0.8125);
+  /* Quiet depth: a hairline lift, nothing that reads as a drop shadow. */
+  --shadow-xs: 0 1px 1px 0 oklch(0.26 0.03 262 / 4%);
+  --shadow-sm: 0 1px 2px 0 oklch(0.26 0.03 262 / 6%);
+  --shadow-md: 0 2px 8px -2px oklch(0.26 0.03 262 / 10%);
+  --shadow-lg: 0 8px 24px -8px oklch(0.26 0.03 262 / 14%);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -25,7 +42,11 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-blush: var(--blush);
+  --color-blush-foreground: var(--blush-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -45,92 +66,103 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* One step softer than before (was 0.625rem). */
+  --radius: 0.75rem;
+  --background: oklch(0.989 0.003 262);
+  --foreground: oklch(0.259 0.031 262);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.259 0.031 262);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.259 0.031 262);
+  --primary: oklch(0.517 0.141 264.3);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.967 0.008 262);
+  --secondary-foreground: oklch(0.259 0.031 262);
+  --muted: oklch(0.967 0.006 262);
+  --muted-foreground: oklch(0.502 0.029 262);
+  --accent: oklch(0.972 0.014 358);
+  --accent-foreground: oklch(0.259 0.031 262);
+  --blush: oklch(0.911 0.034 359);
+  --blush-foreground: oklch(0.44 0.115 2);
+  --destructive: oklch(0.53 0.19 27);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.5 0.115 155);
+  --warning: oklch(0.5 0.1 70);
+  --input: oklch(0.64 0.03 262);
+  --ring: oklch(0.517 0.141 264.3);
+  --border: oklch(0.931 0.01 262);
+  --chart-1: oklch(0.517 0.141 264.3);
+  --chart-2: oklch(0.6 0.12 200);
+  --chart-3: oklch(0.7 0.13 70);
+  --chart-4: oklch(0.65 0.14 5);
+  --chart-5: oklch(0.55 0.03 262);
+  --sidebar: oklch(0.967 0.008 262);
+  --sidebar-foreground: oklch(0.259 0.031 262);
+  --sidebar-primary: oklch(0.517 0.141 264.3);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.972 0.014 358);
+  --sidebar-accent-foreground: oklch(0.259 0.031 262);
+  --sidebar-border: oklch(0.931 0.01 262);
+  --sidebar-ring: oklch(0.517 0.141 264.3);
   --avatar-0: oklch(0.85 0.08 240);
   --avatar-1: oklch(0.88 0.1 340);
   --avatar-2: oklch(0.85 0.07 180);
   --avatar-3: oklch(0.9 0.09 40);
-  --avatar-4: oklch(0.87 0.08 300);
+  --avatar-4: oklch(0.87 0.08 215);
   --avatar-5: oklch(0.85 0.08 150);
   --avatar-6: oklch(0.87 0.08 200);
   --avatar-7: oklch(0.88 0.09 10);
   --avatar-8: oklch(0.92 0.08 80);
-  --avatar-9: oklch(0.86 0.09 270);
+  --avatar-9: oklch(0.86 0.09 255);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 15%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.17 0.014 262);
+  --foreground: oklch(0.95 0.008 262);
+  --card: oklch(0.21 0.018 262);
+  --card-foreground: oklch(0.95 0.008 262);
+  --popover: oklch(0.24 0.02 262);
+  --popover-foreground: oklch(0.95 0.008 262);
+  --primary: oklch(0.74 0.115 264);
+  --primary-foreground: oklch(0.2 0.04 264);
+  --secondary: oklch(0.25 0.016 262);
+  --secondary-foreground: oklch(0.95 0.008 262);
+  --muted: oklch(0.25 0.016 262);
+  --muted-foreground: oklch(0.73 0.025 262);
+  --accent: oklch(0.27 0.02 355);
+  --accent-foreground: oklch(0.95 0.008 262);
+  --blush: oklch(0.34 0.06 357);
+  --blush-foreground: oklch(0.88 0.06 357);
+  --destructive: oklch(0.72 0.16 25);
+  --destructive-foreground: oklch(0.17 0.014 262);
+  --success: oklch(0.76 0.13 155);
+  --warning: oklch(0.8 0.12 75);
+  --input: oklch(1 0 0 / 40%);
+  --ring: oklch(0.74 0.115 264);
+  --border: oklch(1 0 0 / 9%);
+  --chart-1: oklch(0.74 0.115 264);
+  --chart-2: oklch(0.75 0.12 200);
+  --chart-3: oklch(0.8 0.12 75);
+  --chart-4: oklch(0.74 0.13 5);
+  --chart-5: oklch(0.7 0.03 262);
+  --sidebar: oklch(0.21 0.018 262);
+  --sidebar-foreground: oklch(0.95 0.008 262);
+  --sidebar-primary: oklch(0.74 0.115 264);
+  --sidebar-primary-foreground: oklch(0.2 0.04 264);
+  --sidebar-accent: oklch(0.27 0.02 355);
+  --sidebar-accent-foreground: oklch(0.95 0.008 262);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.74 0.115 264);
   --avatar-0: oklch(0.35 0.12 240);
   --avatar-1: oklch(0.38 0.14 340);
   --avatar-2: oklch(0.35 0.11 180);
   --avatar-3: oklch(0.38 0.13 40);
-  --avatar-4: oklch(0.36 0.12 300);
+  --avatar-4: oklch(0.36 0.12 215);
   --avatar-5: oklch(0.35 0.11 150);
   --avatar-6: oklch(0.37 0.12 200);
   --avatar-7: oklch(0.38 0.14 10);
   --avatar-8: oklch(0.4 0.11 80);
-  --avatar-9: oklch(0.36 0.13 270);
+  --avatar-9: oklch(0.36 0.13 255);
 }
 
 a,
@@ -142,11 +174,8 @@ input {
   cursor: text;
 }
 
-/* Prevent mobile zoom on input focus by ensuring 16px minimum font size */
+/* Inputs stay at 16px on phones: below that, iOS zooms the page on focus. */
 @media screen and (max-width: 768px) {
-  html {
-    font-size: 17px;
-  }
   input,
   textarea,
   select {
@@ -186,6 +215,41 @@ input[type="time"] {
 
 body {
   font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tap targets: 44px on phones and other touch screens. */
+@media (max-width: 767px), (pointer: coarse) {
+  .group\/button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
+  select,
+  [data-slot="select-trigger"] {
+    min-height: 44px;
+  }
+}
+
+/* Dark mode: fields are bordered outlines on the card, not filled boxes, so
+   text fields, selects and text areas read the same. */
+.dark [data-slot="input"],
+.dark [data-slot="textarea"],
+.dark [data-slot="select-trigger"] {
+  background-color: transparent;
+}
+
+/* Motion stays quiet: components only move opacity and transform (150-200 ms),
+   and nothing moves for people who ask for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* The mobile pull-to-refresh (see layout/PullToRefresh.tsx) owns the overscroll
