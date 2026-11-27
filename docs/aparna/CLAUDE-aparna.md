@@ -54,6 +54,8 @@ Facts only. Procedures live in skills (`/aparna-loop`). Keep under 80 lines. EDI
 
 ## Mistakes Log
 
+- 2026-11-27 — M5 drove the Part F handover (accounts, billing, transfer) during the pilot; the human corrected: the MVP pilot is testing on synthetic data, and the transfer happens when the human decides → encoded as: in M5, stick to code and build; raise Part F only when the human asks.
+
 - 2026-11-21 — assumed Claude Code cloud sessions lack Docker from a check in a different sandbox → encoded as: fact above (Gotchas) + `docker info` in M-001 acceptance.
 
 - 2026-11-24 — a PR with 0 checks is not a green PR (Actions was off on the fork; PR #1 and #2 merged with no CI) → encoded as: KICKOFF A1 steps 2–3 + aparna-loop CLOSE "0 checks is not green: stop." (P-22).
