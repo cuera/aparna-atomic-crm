@@ -460,6 +460,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/misc/phone.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/misc/isLinkedInUrl.ts",
           "type": "registry:component"
         },
@@ -609,6 +613,10 @@
         },
         {
           "path": "src/components/atomic-crm/deals/dealUtils.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/deals/boardTestUtils.tsx",
           "type": "registry:component"
         },
         {
@@ -777,6 +785,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/TagsList.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/QuickAddEnquiry.tsx",
           "type": "registry:component"
         },
         {

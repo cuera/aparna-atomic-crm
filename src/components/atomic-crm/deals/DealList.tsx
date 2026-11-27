@@ -16,6 +16,7 @@ import { ReferenceInput } from "@/components/admin/reference-input";
 import { FilterButton } from "@/components/admin/filter-form";
 import { SearchInput } from "@/components/admin/search-input";
 
+import { QuickAddEnquiryButton } from "../contacts/QuickAddEnquiry";
 import { DataImportButton } from "../dataImport/DataImportButton";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { TopToolbar } from "../layout/TopToolbar";
@@ -132,6 +133,7 @@ const DealActions = () => (
     <DataImportButton resource="deals" />
     <ExportButton exporter={admissionExporter} />
     <CreateButton label="resources.deals.action.new" />
+    <QuickAddEnquiryButton />
   </TopToolbar>
 );
 

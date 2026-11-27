@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormToolbar } from "../layout/FormToolbar";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import type { Deal } from "../types";
-import { DealInputs } from "./DealInputs";
+import { DealInputs, transformAdmission } from "./DealInputs";
 
 export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
   const redirect = useRedirect();
@@ -36,6 +36,7 @@ export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
           <EditBase
             id={id}
             mutationMode="pessimistic"
+            transform={transformAdmission}
             mutationOptions={{
               onSuccess: () => {
                 notify("resources.deals.updated", {});

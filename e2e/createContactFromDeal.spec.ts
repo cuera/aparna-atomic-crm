@@ -43,7 +43,7 @@ test.describe("user creating a contact from the deal form", () => {
     // "Linked to" keeps this scoped to the deal form once the contact sheet opens
     const dealForm = page.getByRole("dialog").filter({ hasText: "Linked to" });
     await dealForm
-      .getByRole("textbox", { name: "Name" })
+      .getByRole("textbox", { name: "Child name" })
       .fill("Big opportunity");
     await dealForm.getByRole("combobox", { name: "Company" }).click();
     await page.getByRole("option", { name: "Smith Corp" }).click();
