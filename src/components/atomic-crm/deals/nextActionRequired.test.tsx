@@ -38,6 +38,9 @@ describe("Next action required (M-203)", () => {
     const { screen, dataProvider } = await renderEditForm(
       buildAdmission({ id: 1, stage: "trial_done", next_action_at: null }),
     );
+    await expect
+      .element(screen.getByLabelText(/child name/i))
+      .toHaveValue("Asha");
 
     // Act
     await screen.getByRole("button", { name: /^save$/i }).click();
