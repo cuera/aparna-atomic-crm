@@ -133,3 +133,7 @@ FINDINGS:
 ### 2026-11-24 — M1 Foundation (light mode)
 
 - [cuera/aparna-atomic-crm#3](https://github.com/cuera/aparna-atomic-crm/pull/3): Check green on `c38a058` (5 required jobs; pgTAP 5 files, 88 assertions in `e2e-test`). `passes: true`: M-101, M-102, M-103, M-104, M-106, M-108, M-109. M-105 passes (Owner confirmed 2026-11-25: red at the pgTAP step on `040d93d` https://github.com/cuera/aparna-atomic-crm/actions/runs/45434888103/job/138590456682, green after the revert `c38a058` https://github.com/cuera/aparna-atomic-crm/actions/runs/45435848670/job/138593963208). Awaiting the Owner: M-107 (Part A2/A3/A5 clicks; `administrator = true` for the first account only). Lost-column drag fails until M2's lost-reason prompt (S2, accepted).
+
+### 2026-11-27 — M2 Capture and discipline (light mode)
+
+- [cuera/aparna-atomic-crm#5](https://github.com/cuera/aparna-atomic-crm/pull/5): Check green on `2017f17` (5 required jobs; `mvpBoardCard.spec.ts` in `e2e-test`, pgTAP 88 assertions). `passes: true`: M-201, M-202, M-203, M-204, M-205, M-206. P-32 (FakeRest assumed a company; guard added in M3's file with the Owner's approval). Rebase on main once M3 (#4) merges.
