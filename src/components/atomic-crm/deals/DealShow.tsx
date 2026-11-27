@@ -24,7 +24,9 @@ import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate } from "../notes/NoteCreate";
 import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { MarkFeePaidButton } from "../today/MarkFeePaidButton";
 import type { Deal } from "../types";
+import { WhatsAppSend } from "../whatsapp/WhatsAppSend";
 import { ContactList } from "./ContactList";
 import {
   findDealLabel,
@@ -75,7 +77,9 @@ const DealShowContent = () => {
               </ReferenceField>
               <h2 className="text-xl font-semibold">{record.name}</h2>
             </div>
-            <div className={`flex gap-2 ${record.archived_at ? "" : "pr-12"}`}>
+            <div
+              className={`flex flex-wrap items-start justify-end gap-2 ${record.archived_at ? "" : "pr-12"}`}
+            >
               {record.archived_at ? (
                 <>
                   <UnarchiveButton record={record} />
@@ -83,6 +87,8 @@ const DealShowContent = () => {
                 </>
               ) : (
                 <>
+                  <WhatsAppSend deal={record} />
+                  <MarkFeePaidButton deal={record} />
                   <ArchiveButton record={record} />
                   <EditButton />
                 </>

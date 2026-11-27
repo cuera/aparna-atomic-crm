@@ -44,6 +44,22 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/whatsapp/templates.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/whatsapp/WhatsAppSend.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/today/feeDue.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/today/MarkFeePaidButton.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/tasks/tasksPredicate.ts",
           "type": "registry:component"
         },
@@ -457,6 +473,10 @@
         },
         {
           "path": "src/components/atomic-crm/misc/unsupportedDomains.const.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/time.ts",
           "type": "registry:component"
         },
         {
