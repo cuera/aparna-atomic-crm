@@ -1,5 +1,8 @@
 import type { AuthProvider } from "ra-core";
-import { supabaseAuthProvider } from "ra-supabase-core";
+import {
+  supabaseAuthProvider,
+  type ResetPasswordParams,
+} from "ra-supabase-core";
 
 import { canAccess } from "../commons/canAccess";
 import { getSupabaseClient } from "./supabase";
@@ -104,6 +107,14 @@ export const getAuthProvider = (): AuthProvider => {
       }
       return baseAuthProvider.login(params);
     },
+    // Without redirectTo the email links to the Site URL root, where the SPA
+    // drops the recovery token and lands on #/login. auth-callback.html
+    // forwards the token to #/auth-callback, which opens set-password.
+    resetPassword: (params: ResetPasswordParams) =>
+      baseAuthProvider.resetPassword({
+        ...params,
+        redirectTo: `${window.location.origin}/auth-callback.html`,
+      }),
     logout: async () => {
       clearCache();
       // Preserve independent MCP OAuth and other browser sessions.

@@ -14,6 +14,10 @@ Changed
 
 - The admissions import no longer uses the upstream deal columns (name, company, categories, amount, closing date).
 
+Fixed
+
+- "Forgot password?" emails now link to the sign-in callback page (`/auth-callback.html`), so the reset opens the set-password screen instead of the login page. The production Supabase Redirect URLs must list that page.
+
 ## 0.3.0-m2 — 2026-11-27 (M2 Capture and discipline)
 
 Added
