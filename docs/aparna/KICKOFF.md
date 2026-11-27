@@ -16,12 +16,12 @@
 
 Do these steps in this exact order (ADR-A19).
 
-1. New project `aparna-crm`, region Mumbai (`ap-south-1`). Save the database password.
+1. New project `aparna-crm`, region Mumbai (`ap-south-1`). Save the database password. In the creation form keep **Data API** on, **automatically grant access to new tables** on, and **automatically enable RLS on new tables** on (the app reads tables through the Data API; the schema's own grants and policies still apply).
 2. **Immediately:** Authentication → Sign In / Providers → turn **off** "Allow new users to sign up". It stays off permanently (R-13): after the first account, every account comes from an in-app invitation. Leave Google and every other SSO provider off.
-3. Authentication → Emails → SMTP Settings: configure custom SMTP (Resend or Brevo) so invitation and password emails are delivered.
+3. Authentication → Emails → SMTP Settings: configure custom SMTP (Resend or Brevo) so invitation and password emails are delivered. With Resend: first verify a domain you own (DNS records in Resend → Domains); the sender address must be on that domain. Create the API key with **Sending access** only, limited to that domain, and use it as the SMTP password (P-39). Invitation emails may land in Spam at first: tell each invitee to check Spam and mark the email "Not spam".
 4. Plan: free is fine while building with synthetic data. **Upgrade to Pro before the pilot** (real families' data: backups, no auto-pause).
-5. Copy: Project URL, publishable key, project ref (Settings → General). Account → Access Tokens → create one for GitHub Actions.
-6. **Only now**, in GitHub → Settings → Secrets and variables → Actions, add the repository secrets used by the `Deploy` workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID` (project ref), `SUPABASE_URL`, `SB_PUBLISHABLE_KEY`. The next green `Check` on `main` runs `Deploy`, which pushes the schema.
+5. Copy: Project URL, publishable key, project ref (Settings → General). Account → Access Tokens → create one for GitHub Actions. Supabase issues **scoped** tokens: scope it to this project only, with the minimum the `Deploy` workflow needs (P-38): Project Settings **read**, API Keys **read**, API Key Secrets **read**, Edge Functions **read-write**, Edge Function Secrets **read-write**. Give it an expiry and note the date; an expired token turns `Deploy` red.
+6. **Only now**, in GitHub → Settings → Secrets and variables → Actions, add the repository secrets used by the `Deploy` workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID` (project ref), `SUPABASE_URL`, `SB_PUBLISHABLE_KEY`. The next green `Check` on `main` runs `Deploy`, which pushes the schema, sets the Edge Function secret `SB_PUBLISHABLE_KEY` from the repository secret (without it every edge function answers 401: invitations, disabling staff, merges; P-37), and deploys the edge functions. Check Edge Functions → Secrets lists `SB_PUBLISHABLE_KEY` after that run.
 7. Authentication → URL Configuration (after A3): Site URL = `https://<production domain>/auth-callback.html` (the frontend's auth callback, not the bare domain; upstream `doc/src/content/docs/developers/supabase-configuration.mdx`), and add the same URL to Redirect URLs. With the bare domain, invitation links break.
 
 ### A3. Vercel
@@ -230,11 +230,24 @@ make stop
 Until handover, Supabase and Vercel live in the developer's account, test accounts use developer email aliases, and all data is synthetic. Do the handover before the pilot's first real enquiry, in this order:
 
 1. Transfer the Supabase project to the Owner's Supabase organisation, and the Vercel project to the Owner's Vercel account.
-2. Rotate the Supabase secret keys and the database password; update the GitHub repository secrets and the Vercel environment variables; confirm the next `Deploy` run is green.
+2. Rotate the Supabase secret keys and the database password; create a new scoped access token in the Owner's account (permissions in A2 step 5); update the GitHub repository secrets (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SB_PUBLISHABLE_KEY`) and the Vercel environment variables; confirm the next `Deploy` run is green, including the step "Set edge function secret SB_PUBLISHABLE_KEY" (P-37), and that Edge Functions → Secrets lists `SB_PUBLISHABLE_KEY`. If the publishable key changed, a quick check: Users → invite fails with 401 until this run has passed.
 3. Disable the test counsellor account (the two-staff cap, M-108, refuses a third active account).
 4. Signed in as the test owner account: invite the Owner with administrator on. The Owner opens the invitation and sets a password. (Sign-ups stay off; an invitation is the only way in.)
 5. The Owner disables the test owner account, then invites the Counsellor, who sets her own password.
-6. Check `sales`: exactly two active rows, the Owner's with `administrator = true`.
-7. The Owner gives the final wording of the WhatsApp templates (`whatsapp/templates.ts`; approved for testing in M3, PR #4); any change goes in through a PR before real parents are messaged.
-8. Only now does the real data import start (M-401, by a human in the production UI; real files never enter a cloud session or git).
-9. Tick each step in `progress.md` (M-504).
+6. Check `sales`: exactly two active rows, the Owner's with `administrator = true`. The two test accounts were replaced in exactly this order (steps 3–5): test counsellor disabled, Owner invited by the test owner, test owner disabled by the Owner, then the Counsellor invited. Disabled rows stay (users are never deleted).
+7. **Remove all synthetic test data before the first real enquiry.** No test parents, admissions, notes, tasks or imported rows may remain. In Supabase → SQL Editor, run in one go (children first):
+    ```sql
+    begin;
+    delete from public.tasks;
+    delete from public.deal_notes;
+    delete from public.contact_notes;
+    delete from public.deals;
+    delete from public.contacts;
+    delete from public.companies;
+    delete from public.tags;
+    commit;
+    ```
+    Then Storage → `attachments` → delete every file (note attachments of test notes). Check: Today shows the onboarding steps (empty CRM), the board and the Parents list are empty. This cannot be undone: run it only in the production project, only before any real enquiry is entered.
+8. The Owner gives the final wording of the WhatsApp templates (`whatsapp/templates.ts`; approved for testing in M3, PR #4); any change goes in through a PR before real parents are messaged.
+9. Only now does the real data import start (M-401, by a human in the production UI; real files never enter a cloud session or git).
+10. Tick each step in `progress.md` (M-504).

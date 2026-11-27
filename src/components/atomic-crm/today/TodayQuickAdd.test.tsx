@@ -133,4 +133,40 @@ describe("Quick-add on Today (M-403)", () => {
     );
     expect(kabir).toMatchObject({ stage: "enquiry", contact_ids: [1] });
   });
+
+  it("offers quick-add on an empty CRM, next to the onboarding steps, and lands the enquiry on Today", async () => {
+    // Arrange: a brand-new CRM, no parent yet
+    const dataProvider = createDataProvider({
+      db: createCrmDb({ contacts: [], deals: [] }),
+      latency: 0,
+      silent: true,
+    });
+    const screen = await render(
+      <StoryWrapper dataProvider={dataProvider}>
+        <TodayPage />
+      </StoryWrapper>,
+    );
+    await expect
+      .element(screen.getByRole("heading", { name: "What's next?" }))
+      .toBeVisible();
+
+    // Act
+    await screen.getByRole("button", { name: "Quick add enquiry" }).click();
+    const dialog = screen.getByRole("dialog", { name: "Quick add enquiry" });
+    await dialog.getByLabelText(/parent name/i).fill("Dana Lee");
+    await dialog.getByLabelText(/whatsapp number/i).fill("+1 415 555 2671");
+    await dialog.getByLabelText(/child name/i).fill("Ben");
+    await dialog.getByRole("button", { name: "Save" }).click();
+
+    // Assert: the parent comes with an admission, so it shows under New
+    await expect
+      .element(
+        screen
+          .getByRole("region", { name: "New" })
+          .getByText("Ben", { exact: true }),
+      )
+      .toBeVisible();
+    const [deal] = await getAll<Deal>(dataProvider, "deals");
+    expect(deal).toMatchObject({ child_name: "Ben", stage: "enquiry" });
+  });
 });

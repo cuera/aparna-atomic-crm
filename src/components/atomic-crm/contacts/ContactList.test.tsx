@@ -167,16 +167,15 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: /close/i }).click();
   });
 
-  it("imports contacts from a dialog with no resource to pick", async () => {
+  it("offers no parents-only import on an empty parent list", async () => {
+    // M5: a parent imported without an admission never shows on Today or the board
     const screen = await render(<DesktopEmpty />);
 
-    await screen.getByRole("button", { name: "Import CSV" }).click();
-
     await expect
-      .element(screen.getByRole("heading", { name: "Import parents" }))
+      .element(screen.getByRole("link", { name: "New Parent" }))
       .toBeVisible();
     await expect
-      .element(screen.getByLabelText("Resource"))
+      .element(screen.getByRole("button", { name: "Import CSV" }))
       .not.toBeInTheDocument();
   });
 

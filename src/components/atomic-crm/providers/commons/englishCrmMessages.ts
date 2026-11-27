@@ -396,7 +396,7 @@ export const englishCrmMessages = {
         creating: "Creating...",
         initial_user_created: "Initial user successfully created",
       },
-      welcome_title: "Welcome to Atomic CRM",
+      welcome_title: "Welcome to Aparna's English Coaching",
     },
     common: {
       account_manager: "Account manager",

@@ -56,7 +56,8 @@ export const DashboardStepper = ({
                     _: "What's next?",
                   })}
                 </h3>
-                <DataImportButton />
+                {/* M5: only the admissions importer (a parents-only CSV loses leads) */}
+                <DataImportButton resource="deals" />
               </div>
               <div className="w-[150px]">
                 <Progress value={(step / 3) * 100} className="mb-2" />

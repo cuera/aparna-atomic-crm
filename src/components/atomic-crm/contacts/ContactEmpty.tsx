@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 import { useTranslate } from "ra-core";
 
 import useAppBarHeight from "../misc/useAppBarHeight";
-import { DataImportButton } from "../dataImport/DataImportButton";
 import { ContactCreateSheet } from "./ContactCreateSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -46,10 +45,9 @@ export const ContactEmpty = () => {
               {translate("resources.contacts.action.new")}
             </Button>
           ) : (
-            <>
-              <CreateButton label="resources.contacts.action.new" />
-              <DataImportButton resource="contacts" />
-            </>
+            // M5: no parents-only import; a parent with no admission is invisible
+            // on Today and the board. Imports go through the admissions importer.
+            <CreateButton label="resources.contacts.action.new" />
           )}
         </div>
       </div>
