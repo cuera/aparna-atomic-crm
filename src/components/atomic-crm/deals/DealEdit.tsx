@@ -31,7 +31,7 @@ export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
 
   return (
     <Dialog open={open} onOpenChange={() => handleClose()}>
-      <DialogContent className="lg:max-w-4xl overflow-y-auto max-h-9/10 top-1/20 translate-y-0">
+      <DialogContent className="grid-cols-[minmax(0,1fr)] lg:max-w-4xl overflow-y-auto max-h-9/10 top-1/20 translate-y-0">
         {id ? (
           <EditBase
             id={id}
@@ -68,7 +68,7 @@ function EditHeader() {
 
   return (
     <DialogTitle className="pb-0">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-wrap justify-between items-start gap-2">
         <div className="flex items-center gap-4">
           <ReferenceField source="company_id" reference="companies" link="show">
             <CompanyAvatar />

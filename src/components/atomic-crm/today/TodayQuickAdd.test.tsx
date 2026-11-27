@@ -149,6 +149,16 @@ describe("Quick-add on Today (M-403)", () => {
     await expect
       .element(screen.getByRole("heading", { name: "What's next?" }))
       .toBeVisible();
+    // The sections wait under the steps, empty, so it is clear where work lands
+    for (const name of [
+      "New",
+      "Follow-ups due",
+      "Trials today and tomorrow",
+      "Payment pending",
+      "Fees due",
+    ]) {
+      await expect.element(screen.getByRole("region", { name })).toBeVisible();
+    }
 
     // Act
     await screen.getByRole("button", { name: "Quick add enquiry" }).click();
