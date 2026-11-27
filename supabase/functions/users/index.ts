@@ -11,6 +11,7 @@ import {
 } from "./secondaryEmails.ts";
 import {
   applyStaffAccess,
+  assertStaffSlotFree,
   isStaffCapError,
   STAFF_CAP_ERROR_CODE,
 } from "./staffAccess.ts";
@@ -30,6 +31,15 @@ async function updateLoginBan(user_id: string, banned: boolean) {
     ban_duration: banned ? "87600h" : "none",
   });
   if (error) throw error;
+}
+
+async function countActiveStaff(): Promise<number> {
+  const { count, error } = await supabaseAdmin
+    .from("sales")
+    .select("id", { count: "exact", head: true })
+    .eq("disabled", false);
+  if (error) throw error;
+  return count ?? 0;
 }
 
 const staffCapResponse = (error: { message: string }) =>
@@ -161,6 +171,15 @@ async function inviteUser(req: Request, currentUserSale: any) {
       `Email already used by another user: ${takenEmail}`,
       { code: "email_taken", email: takenEmail },
     );
+  }
+
+  // P-28: refuse a third account before anything is written, with the cap message
+  try {
+    await assertStaffSlotFree(countActiveStaff);
+  } catch (e) {
+    if (isStaffCapError(e)) return staffCapResponse(e);
+    console.error("Error counting active staff:", e);
+    return createErrorResponse(500, "Internal Server Error");
   }
 
   const id = crypto.randomUUID();

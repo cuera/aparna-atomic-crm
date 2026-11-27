@@ -17,7 +17,9 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
 
   await expect(page.getByText("What's next?")).toBeVisible();
   await expect(page.getByText("1/3 done")).toBeVisible();
-  await expect(page.getByText("Install Atomic CRM")).toBeVisible();
+  await expect(
+    page.getByText("Set up Aparna's English Coaching"),
+  ).toBeVisible();
   await expect(page.getByText("Add your first parent")).toBeVisible();
   await expect(page.getByText("Add your first note")).toBeVisible();
   // M5: Quick add sits above the onboarding steps; the only import is the
