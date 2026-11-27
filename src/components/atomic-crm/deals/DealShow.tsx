@@ -69,7 +69,7 @@ export const DealShowContent = () => {
       <div className="space-y-2">
         {record.archived_at ? <ArchivedTitle /> : null}
         <div className="flex-1">
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex flex-wrap gap-4 justify-between items-start mb-8">
             <div className="flex items-center gap-4">
               <ReferenceField
                 source="company_id"
@@ -105,7 +105,7 @@ export const DealShowContent = () => {
             </div>
           </div>
 
-          <div className="flex gap-8 m-4">
+          <div className="flex flex-wrap gap-8 m-4">
             <div className="flex flex-col mr-10">
               <span className="text-xs text-muted-foreground tracking-wide">
                 {translate("resources.deals.fields.expected_closing_date")}

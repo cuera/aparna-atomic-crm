@@ -172,6 +172,14 @@ Status: Accepted (Gate MVP-A, 2026-11-23) · Date: 2026-11-23 · Amends ADR-A01 
 - Consequences: faster slices; the Check run and the Preview are the evidence; full-build slices keep the process in `project_plan.md`.
 - Reversal condition: if M1 spends more than one day fighting fork conventions, stop and propose a fresh Next.js + Supabase rebuild that uses `MVP.md` as the spec.
 
+### ADR-A21 — Today opens admissions in place
+Status: Proposed · Date: 2026-11-27
+- Context: M-301 says every Today row opens the admission. The desktop has the Admissions board with its show route; the mobile app registers no `deals` resource, so a link to the board route would 404 on a phone, and the Counsellor works WhatsApp-first on a phone.
+- Options: A) Today opens the admission in a dialog on the Today page (`?admission=<id>`), reusing the detail content, on desktop and mobile; board-only actions (archive, edit) hidden on mobile. B) desktop links to the board route, mobile gets a new `deals` resource in `root/CRM.tsx` (outside M3's owned lines). C) mobile rows do not open anything.
+- Decision: A. One behaviour on both screens; the URL keeps the open admission; no change outside M3's files.
+- Consequences: on a phone an admission can be read, messaged and marked paid but not edited or archived until a mobile edit exists (M2/M5 decision). The old dashboard components stay in `dashboard/` unused.
+- Reversal condition: the pilot shows phone users need to edit admissions → add the mobile `deals` resource and route Today rows to it.
+
 ## Provenance & audit
 Sources: chat analysis 20–21 Nov 2026, upstream repo inspection, Meta and Razorpay docs.
 Checked: each ADR has options, decision, consequences and an observable reversal condition; ADR IDs referenced in PRD/ARCHITECTURE exist here (A03, A07); A01–A10 stay Proposed until Gate A; A11–A16 and A18–A20 Accepted at Gate MVP-A (2026-11-23, gate-reviewer PASS 85); A17 stays Proposed.
