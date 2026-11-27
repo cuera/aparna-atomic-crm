@@ -88,3 +88,13 @@ export const istWeekStart = (now: Date): Date => {
   const daysSinceMonday = (weekday + 6) % 7;
   return istDayStart(addDaysToDateKey(today, -daysSinceMonday));
 };
+
+/** Value for an `<input type="datetime-local">` that shows IST: "2026-12-05T17:30". */
+export const toIstInputValue = (date: Date): string =>
+  new Date(date.getTime() + IST_OFFSET_MS).toISOString().slice(0, 16);
+
+/** Reads an IST datetime-local value back as an instant; null when empty or invalid. */
+export const fromIstInputValue = (value: string): Date | null => {
+  const ms = Date.parse(`${value}:00Z`);
+  return Number.isNaN(ms) ? null : new Date(ms - IST_OFFSET_MS);
+};
