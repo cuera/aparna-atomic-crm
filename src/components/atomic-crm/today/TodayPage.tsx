@@ -140,6 +140,14 @@ const firstParentId = (deal: Deal): Identifier | undefined =>
 const shownDeals = (sections: TodaySections): Deal[] =>
   Object.values(sections).flat();
 
+const TodayHeader = () => (
+  <div className="flex flex-wrap items-center justify-between gap-2">
+    <h1 className="text-2xl font-semibold">Today</h1>
+    {/* M-403: the board's quick-add, reused as is */}
+    <QuickAddEnquiryButton />
+  </div>
+);
+
 /** M-301: the landing page; replaces the desktop and the mobile dashboard. */
 export const TodayPage = () => {
   const now = useNow();
@@ -188,9 +196,15 @@ export const TodayPage = () => {
       </p>
     );
   }
-  // A brand-new CRM: keep the onboarding steps (add or import parents).
+  // A brand-new CRM: the onboarding steps, under the same Quick add as a
+  // working day, so the first enquiry is captured with its admission (M5).
   if (!totalContacts) {
-    return <DashboardStepper step={1} />;
+    return (
+      <div className="flex flex-col gap-4 mt-1">
+        <TodayHeader />
+        <DashboardStepper step={1} />
+      </div>
+    );
   }
 
   const today = istDateKey(now);
@@ -200,11 +214,7 @@ export const TodayPage = () => {
 
   return (
     <div className="flex flex-col gap-4 mt-1">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold">Today</h1>
-        {/* M-403: the board's quick-add, reused as is */}
-        <QuickAddEnquiryButton />
-      </div>
+      <TodayHeader />
       <ThisWeekStrip deals={deals} now={now} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Section title="New" count={sections.newEnquiries.length}>

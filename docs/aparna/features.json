@@ -146,7 +146,7 @@
         "build and test phase: Supabase and Vercel in the developer's account, test accounts on developer email aliases, synthetic data only (ADR-A20); handover is M-504"
       ],
       "verify": "manual:production URL, preview URL and login check in progress.md",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-108",

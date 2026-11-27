@@ -4,8 +4,10 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await page.goto("/");
 
   // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Atomic CRM/);
-  await expect(page.getByText("Welcome to Atomic CRM")).toBeVisible();
+  await expect(page).toHaveTitle(/Aparna's English Coaching/);
+  await expect(
+    page.getByText("Welcome to Aparna's English Coaching"),
+  ).toBeVisible();
 
   await page.getByLabel("First name").fill("John");
   await page.getByLabel("Last name").fill("Doe");
@@ -18,7 +20,16 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await expect(page.getByText("Install Atomic CRM")).toBeVisible();
   await expect(page.getByText("Add your first parent")).toBeVisible();
   await expect(page.getByText("Add your first note")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Import data" })).toBeVisible();
+  // M5: Quick add sits above the onboarding steps; the only import is the
+  // admissions importer, which mobile does not offer (no admission screens)
+  await expect(
+    page.getByRole("button", { name: "Quick add enquiry" }),
+  ).toBeVisible();
+  if (!isMobile) {
+    await expect(
+      page.getByRole("button", { name: "Import CSV" }),
+    ).toBeVisible();
+  }
 
   await page
     .getByRole(isMobile ? "button" : "link", { name: "Add parent" })

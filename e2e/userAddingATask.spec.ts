@@ -45,7 +45,7 @@ test.describe("user adding a task", () => {
     await page.getByLabel("Password").fill("password");
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(page).toHaveTitle(/Atomic CRM/);
+    await expect(page).toHaveTitle(/Aparna's English Coaching/);
     await expect(
       page.getByRole("heading", { name: "Today", level: 1 }),
     ).toBeVisible();

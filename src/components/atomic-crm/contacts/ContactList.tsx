@@ -18,7 +18,6 @@ import { Card } from "@/components/ui/card";
 import { exporter } from "./contactExporter";
 import { BulkTagButton } from "./BulkTagButton";
 import { ContactEmpty } from "./ContactEmpty";
-import { DataImportButton } from "../dataImport/DataImportButton";
 import {
   ContactListContent,
   ContactListContentMobile,
@@ -86,7 +85,6 @@ const ContactBulkActionButtons = () => (
 const ContactListActions = () => (
   <TopToolbar>
     <SortButton fields={["first_name", "last_name", "last_seen"]} />
-    <DataImportButton resource="contacts" />
     <ExportButton exporter={exporter} />
     <CreateButton />
   </TopToolbar>

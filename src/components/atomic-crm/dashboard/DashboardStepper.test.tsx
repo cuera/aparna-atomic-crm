@@ -13,16 +13,22 @@ describe("DashboardStepper", () => {
     mockIsMobile.mockReturnValue(false);
   });
 
-  it("opens the data import dialog from the onboarding header", async () => {
+  it("opens the admissions importer only from the onboarding header", async () => {
     const screen = await render(<FirstStep />);
 
     await expect
       .element(screen.getByRole("heading", { name: "What's next?" }))
       .toBeVisible();
 
-    await screen.getByRole("button", { name: "Import data" }).click();
+    await screen.getByRole("button", { name: "Import CSV" }).click();
 
-    await expect.element(screen.getByLabelText("Resource")).toBeVisible();
+    // M5: no resource to pick, so no parents-only or companies import
+    await expect
+      .element(screen.getByRole("heading", { name: "Import admissions" }))
+      .toBeVisible();
+    await expect
+      .element(screen.getByLabelText("Resource"))
+      .not.toBeInTheDocument();
   });
 
   it("links to the contact creation page on desktop", async () => {
