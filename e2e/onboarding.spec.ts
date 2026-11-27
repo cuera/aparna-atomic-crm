@@ -71,46 +71,13 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await expect(page.locator(isMobile ? "h2" : "h5")).toHaveText("Jane Smith");
   await expect(page.getByText("CEO at Smith Corp")).toBeVisible();
 
+  // M3: with a first parent, the landing page is Today (the onboarding steps end here)
   await menu.goToDashboard();
   await page.waitForLoadState("networkidle");
 
-  await expect(page.getByText("2/3 done")).toBeVisible();
-
-  await page
-    .getByRole(isMobile ? "button" : "link", { name: "Add note" })
-    .click();
-
-  await page.waitForLoadState("networkidle");
-
-  await page.getByPlaceholder("Add a note").fill("This is a note about Jane.");
-  await page
-    .getByRole("button", { name: isMobile ? "Save" : "Add this note" })
-    .click();
-
-  // Mobile shows no success snackbar
-  if (!isMobile) {
-    await dismissToast("Note added");
-  }
-
   await expect(
-    page.getByText(isMobile ? "Me" : "You added a note", { exact: false }),
+    page.getByRole("heading", { name: "Today", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("This is a note about Jane.")).toBeVisible();
-
-  await menu.goToDashboard();
-
-  await page.waitForLoadState("networkidle");
-
-  await expect(page.getByText("Latest Activity")).toBeVisible();
-  await expect(
-    page.getByText("Latest Activity").locator("xpath=../.."),
-  ).toHaveText(/You added company Smith Corp today at/);
-
-  await expect(
-    page.getByText("Latest Activity").locator("xpath=../.."),
-  ).toHaveText(/You added Jane Smith to Smith Corp today at/);
-
-  await expect(
-    page.getByText("Latest Activity").locator("xpath=../.."),
-  ).toHaveText(/You added a note about Jane Smith today at/);
+  await expect(page.getByRole("region", { name: "This week" })).toBeVisible();
+  await expect(page.getByText("2/3 done")).toBeHidden();
 });

@@ -26,6 +26,11 @@ import type { ConfigurationContextValue } from "../../root/ConfigurationContext"
 import { getActivityLog } from "../commons/activity";
 import { getCompanyAvatar } from "../commons/getCompanyAvatar";
 import { getContactAvatar } from "../commons/getContactAvatar";
+import {
+  addMonthsToDateKey,
+  feePaidNoteText,
+  feePeriodMonths,
+} from "../../today/feeDue";
 import { mergeContacts } from "../commons/mergeContacts";
 import { getSearchResults } from "./search";
 import type { CrmDataProvider } from "../types";
@@ -154,6 +159,7 @@ export const createDataProvider = ({
   let taskUpdateType = TASK_DONE_NOT_CHANGED;
   let companiesToUpdate:
     { increment?: Identifier; decrement?: Identifier } | undefined = undefined;
+  let feePaidQueue: Promise<boolean> = Promise.resolve(false);
   const getIdentity = async () =>
     authProvider?.getIdentity?.() ?? defaultAuthProvider.getIdentity?.();
 
@@ -328,6 +334,43 @@ export const createDataProvider = ({
     },
     mergeContacts: async (sourceId: Identifier, targetId: Identifier) => {
       return mergeContacts(sourceId, targetId, baseDataProvider);
+    },
+    // M-305: the same compare-and-set as SQL mark_fee_paid, serialised so two
+    // concurrent calls with the same shown date advance the fee once.
+    markFeePaid: (dealId: Identifier, shownDue: string): Promise<boolean> => {
+      const run = async () => {
+        const { data: deal } = await baseDataProvider.getOne<Deal>("deals", {
+          id: dealId,
+        });
+        if (deal.next_fee_due == null || deal.next_fee_due !== shownDue) {
+          return false;
+        }
+        const months = feePeriodMonths(deal.fee_period);
+        if (months == null) {
+          throw new Error(
+            `Admission ${dealId} has a next fee due date but no fee period`,
+          );
+        }
+        const newDue = addMonthsToDateKey(shownDue, months);
+        await baseDataProvider.update<Deal>("deals", {
+          id: dealId,
+          data: { next_fee_due: newDue },
+          previousData: deal,
+        });
+        const identity = await getIdentity();
+        await dataProvider.create("deal_notes", {
+          data: {
+            deal_id: dealId,
+            text: feePaidNoteText(deal.fee_amount_paise, shownDue, newDue),
+            date: new Date().toISOString(),
+            sales_id: identity?.id,
+          },
+        });
+        return true;
+      };
+      const result = feePaidQueue.then(run);
+      feePaidQueue = result.catch(() => false);
+      return result;
     },
     getConfiguration: async (): Promise<ConfigurationContextValue> => {
       const { data } = await baseDataProvider.getOne("configuration", {

@@ -181,6 +181,8 @@ Slice M5 (features M-501..M-504).
    Before the pilot's first real enquiry, walk me through the handover checklist (KICKOFF.md Part F, M-504).
 2. During the pilot I will paste issues here. For each: fix it in this slice if small and inside MVP scope,
    otherwise add a row to problems.md and defer it. Keep the PR updated.
+   Pilot checks to ask me about: does the Counsellor need to change an admission's stage on the phone? (ADR-A21:
+   phones open admissions from Today but cannot edit or archive; yes → add the mobile deals route.)
 3. At the end, fill the baseline table in progress.md from the This-week strip numbers I give you,
    and propose the first full-build slice using TRANSITION.md section 3.
 ```
@@ -233,5 +235,6 @@ Until handover, Supabase and Vercel live in the developer's account, test accoun
 4. Signed in as the test owner account: invite the Owner with administrator on. The Owner opens the invitation and sets a password. (Sign-ups stay off; an invitation is the only way in.)
 5. The Owner disables the test owner account, then invites the Counsellor, who sets her own password.
 6. Check `sales`: exactly two active rows, the Owner's with `administrator = true`.
-7. Only now does the real data import start (M-401, by a human in the production UI; real files never enter a cloud session or git).
-8. Tick each step in `progress.md` (M-504).
+7. The Owner gives the final wording of the WhatsApp templates (`whatsapp/templates.ts`; approved for testing in M3, PR #4); any change goes in through a PR before real parents are messaged.
+8. Only now does the real data import start (M-401, by a human in the production UI; real files never enter a cloud session or git).
+9. Tick each step in `progress.md` (M-504).

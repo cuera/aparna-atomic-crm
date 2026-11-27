@@ -3,20 +3,12 @@ import { useRedirect } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import { formatInZone, IST } from "../misc/time";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { isOpenStage } from "./DealInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-// Staff work in IST (CLAUDE-aparna.md "Times")
-const nextActionFormat = new Intl.DateTimeFormat("en-IN", {
-  timeZone: "Asia/Kolkata",
-  day: "numeric",
-  month: "short",
-  hour: "numeric",
-  minute: "2-digit",
-});
 
 const daysInStage = (stageChangedAt: string, now = Date.now()) =>
   Math.max(0, Math.floor((now - new Date(stageChangedAt).getTime()) / DAY_MS));
@@ -85,7 +77,7 @@ export const DealCardContent = ({
               )}
               data-overdue={isOverdue}
             >
-              Next: {nextActionFormat.format(new Date(deal.next_action_at!))}
+              Next: {formatInZone(deal.next_action_at!, IST)}
               {isOverdue && " (overdue)"}
             </p>
           )}
