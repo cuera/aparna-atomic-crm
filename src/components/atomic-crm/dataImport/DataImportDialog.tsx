@@ -26,7 +26,9 @@ import { FormToolbar } from "@/components/admin/simple-form";
 import { FileInput } from "@/components/admin/file-input";
 import { FileField } from "@/components/admin/file-field";
 
+import { AdmissionImportReport } from "./AdmissionImportReport";
 import type { ImportableResource } from "./types";
+import type { AdmissionImportReport as Report } from "./useAdmissionImport";
 import type { ImportableResourceName } from "./useImportableResources";
 
 type DataImportDialogProps = {
@@ -37,6 +39,10 @@ type DataImportDialogProps = {
   onResourceChange(name: ImportableResourceName): void;
   onStart(file: File): void;
   onClose(): void;
+  /** Report of a whole-file import, shown in place of a progress toast. */
+  report?: Report | null;
+  /** A whole-file import is being checked or written. */
+  isWorking?: boolean;
 };
 
 export function DataImportDialog({
@@ -46,6 +52,8 @@ export function DataImportDialog({
   onResourceChange,
   onStart,
   onClose,
+  report,
+  isWorking = false,
 }: DataImportDialogProps) {
   const translate = useTranslate();
   const getResourceLabel = useGetResourceLabel();
@@ -136,12 +144,18 @@ export function DataImportDialog({
             >
               <FileField source="src" title="title" target="_blank" />
             </FileInput>
+            {isWorking && (
+              <p role="status" className="text-sm text-muted-foreground">
+                Checking every row, then importing…
+              </p>
+            )}
+            {report && <AdmissionImportReport report={report} />}
           </div>
         </Form>
 
         <div className="flex justify-start">
           <FormToolbar>
-            <Button onClick={handleStart} disabled={!file}>
+            <Button onClick={handleStart} disabled={!file || isWorking}>
               {translate("crm.data_import.start")}
             </Button>
           </FormToolbar>

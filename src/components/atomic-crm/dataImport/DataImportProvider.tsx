@@ -13,6 +13,8 @@ import { useNotify, useRefresh } from "ra-core";
 import { usePapaParse } from "../misc/usePapaParse";
 import { DataImportDialog } from "./DataImportDialog";
 import { DataImportProgressToast } from "./DataImportProgressToast";
+import { parseCsvRows } from "./parseCsvRows";
+import type { AdmissionImportReport } from "./useAdmissionImport";
 import type { ImportableResource, ImportRow } from "./types";
 import type { ImportableResourceName } from "./useImportableResources";
 import { useImportableResources } from "./useImportableResources";
@@ -47,6 +49,9 @@ export const DataImportProvider = ({ children }: { children: ReactNode }) => {
   );
   const [resourceName, setResourceName] =
     useState<ImportableResourceName | null>(null);
+  // Whole-file imports (admissions) report in the dialog instead of a toast
+  const [report, setReport] = useState<AdmissionImportReport | null>(null);
+  const [isCheckingFile, setIsCheckingFile] = useState(false);
 
   // The resource is read from `resources` on every render, keeping only the
   // selected name in state: `useConfigurationLoader` fills the configuration
@@ -63,7 +68,9 @@ export const DataImportProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const isImporting =
-    importer.state === "parsing" || importer.state === "running";
+    importer.state === "parsing" ||
+    importer.state === "running" ||
+    isCheckingFile;
 
   useEffect(() => {
     if (importer.state === "complete") {
@@ -98,6 +105,7 @@ export const DataImportProvider = ({ children }: { children: ReactNode }) => {
       if (importer.state === "complete" || importer.state === "error") {
         reset();
       }
+      setReport(null);
       setPinnedName(pinned ?? null);
       setResourceName(pinned ?? resources[0]?.name ?? null);
       setIsDialogOpen(true);
@@ -120,9 +128,37 @@ export const DataImportProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [importer, notify, refresh, reset]);
 
+  const importWholeFile = async (
+    file: File,
+    importAll: NonNullable<ImportableResource["importAll"]>,
+  ) => {
+    setReport(null);
+    setIsCheckingFile(true);
+    try {
+      setReport(await importAll(await parseCsvRows(file)));
+    } catch (error: unknown) {
+      // The file could not be read or the existing parents could not be
+      // looked up: nothing was written yet
+      console.error("Failed to import the file", error);
+      notify("crm.data_import.error", { type: "error" });
+    } finally {
+      setIsCheckingFile(false);
+      refresh();
+    }
+  };
+
   const startImport = (file: File) => {
+    if (resource?.importAll) {
+      void importWholeFile(file, resource.importAll);
+      return;
+    }
     parseCsv(file);
     setIsDialogOpen(false);
+  };
+
+  const changeResource = (name: ImportableResourceName) => {
+    setReport(null);
+    setResourceName(name);
   };
 
   const value = useMemo(
@@ -142,9 +178,13 @@ export const DataImportProvider = ({ children }: { children: ReactNode }) => {
               : resources
           }
           resource={resource}
-          onResourceChange={setResourceName}
+          onResourceChange={changeResource}
+          report={report}
+          isWorking={isCheckingFile}
           onStart={startImport}
-          onClose={() => setIsDialogOpen(false)}
+          onClose={() => {
+            if (!isCheckingFile) setIsDialogOpen(false);
+          }}
         />
       )}
       <DataImportProgressToast importer={importer} onStop={stopImport} />

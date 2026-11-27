@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
+import { QuickAddEnquiryButton } from "../contacts/QuickAddEnquiry";
 import { DashboardStepper } from "../dashboard/DashboardStepper";
 import { DealShowContent } from "../deals/DealShow";
 import { MobileContent } from "../layout/MobileContent";
@@ -199,7 +200,11 @@ export const TodayPage = () => {
 
   return (
     <div className="flex flex-col gap-4 mt-1">
-      <h1 className="text-2xl font-semibold">Today</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-semibold">Today</h1>
+        {/* M-403: the board's quick-add, reused as is */}
+        <QuickAddEnquiryButton />
+      </div>
       <ThisWeekStrip deals={deals} now={now} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Section title="New" count={sections.newEnquiries.length}>

@@ -280,7 +280,8 @@ describe("DataImportButton", () => {
     ]);
   });
 
-  it("imports a deal the dialog parsed, down to its owner", async () => {
+  it("checks every admission row first: a failing file writes nothing and lists the rows, a fixed one imports in one go", async () => {
+    // Arrange
     const dataProvider = createDataProvider({
       db: createCrmDb(),
       latency: 0,
@@ -288,38 +289,70 @@ describe("DataImportButton", () => {
     });
     const screen = await render(
       <StoryWrapper dataProvider={dataProvider}>
-        <DataImportButton />
+        <DataImportButton resource="deals" />
       </StoryWrapper>,
     );
+    const header = "parent_name,phone,child_name,stage,lost_reason";
+    const goodRow = "Asha Verma,98765 00001,Riya,Enquiry,";
+    await screen.getByRole("button", { name: "Import CSV" }).click();
 
-    await screen.getByRole("button", { name: "Import data" }).click();
-    await screen.getByLabelText("Resource").click();
-    await screen.getByRole("listbox").getByText("Admissions").click();
-
+    // Act: synthetic rows; row 3 has a bad phone, row 4 is lost with no reason
     await screen
       .getByLabelText("CSV File")
       .upload(
-        csvFile("deals.csv", [
-          "name,company,stage,amount,expected_closing_date",
-          "New website,Acme,Trial booked,4500.50,2026-09-30",
+        csvFile("admissions.csv", [
+          header,
+          goodRow,
+          "Tom Baker,12345,Lily,Enquiry,",
+          "Neha Iyer,98765 00002,Arjun,Lost,",
         ]),
       );
     await screen.getByRole("button", { name: "Start import" }).click();
 
-    await expect.element(screen.getByText(/Import complete/)).toBeVisible();
+    // Assert
+    const errors = screen
+      .getByRole("alert")
+      .filter({ hasText: "Nothing was imported" });
+    await expect.element(errors).toBeVisible();
+    await expect
+      .element(errors.getByText(/Row 3: phone: Enter a valid WhatsApp number/))
+      .toBeVisible();
+    await expect
+      .element(errors.getByText("Row 4: lost rows need a lost reason"))
+      .toBeVisible();
+    expect((await listAll(dataProvider, "deals")).data).toHaveLength(0);
+    expect((await listAll(dataProvider, "contacts")).data).toHaveLength(0);
 
+    // Act: the fixed file
+    await screen
+      .getByLabelText("CSV File")
+      .upload(
+        csvFile("admissions.csv", [
+          header,
+          goodRow,
+          "Asha Verma,+91 98765 00001,Kabir,Enquiry,",
+          "Neha Iyer,98765 00002,Arjun,Lost,Price",
+        ]),
+      );
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    // Assert
+    const result = screen.getByRole("status");
+    await expect
+      .element(result.getByText("Imported 3 admissions."))
+      .toBeVisible();
+    await expect
+      .element(result.getByText("Row 3: links to existing parent (from row 2)"))
+      .toBeVisible();
     const { data: deals } = await listAll(dataProvider, "deals");
-    expect(deals).toHaveLength(1);
-    // The hooks are read through the dialog rather than called directly, so the
-    // wiring this feature adds is covered too — the owner in particular, which
-    // the dialog is the only thing to bring in
-    expect(deals[0]).toMatchObject({
-      // A fractional amount would make the bigint column reject the row
-      amount: 4501,
-      sales_id: DEFAULT_USER.id,
-      stage: "trial_booked",
-    });
-    expect(deals[0].expected_closing_date).toBe("2026-09-30");
+    expect(deals.map(({ name, stage }) => ({ name, stage }))).toEqual([
+      { name: "Riya", stage: "enquiry" },
+      { name: "Kabir", stage: "enquiry" },
+      { name: "Arjun", stage: "lost" },
+    ]);
+    // The dialog brings in the owner
+    expect(deals[0].sales_id).toBe(DEFAULT_USER.id);
+    expect((await listAll(dataProvider, "contacts")).data).toHaveLength(2);
   });
 
   it("keeps the leading zero of the text columns of a company CSV", async () => {

@@ -7,7 +7,7 @@ import dealsSampleCsv from "./deals_sample.csv?raw";
 import contactsSampleCsv from "../contacts/contacts_export.csv?raw";
 import type { ImportableResource } from "./types";
 import { useCompanyImport } from "./useCompanyImport";
-import { useDealImport } from "./useDealImport";
+import { useAdmissionImport } from "./useAdmissionImport";
 
 /** Every resource a CSV can be imported into, in the order the dialog offers them. */
 export const IMPORTABLE_RESOURCES = ["contacts", "companies", "deals"] as const;
@@ -22,7 +22,7 @@ export type ImportableResourceName = (typeof IMPORTABLE_RESOURCES)[number];
 export function useImportableResources(): ImportableResource[] {
   const processContacts = useContactImport();
   const processCompanies = useCompanyImport();
-  const processDeals = useDealImport();
+  const importAdmissions = useAdmissionImport();
   const definitions = useResourceDefinitions();
 
   const resources: ImportableResource[] = [
@@ -42,7 +42,8 @@ export function useImportableResources(): ImportableResource[] {
       textColumns: ["zipcode", "phone_number", "tax_identifier"],
       processBatch: processCompanies,
     },
-    { name: "deals", sampleCsv: dealsSampleCsv, processBatch: processDeals },
+    // The one admissions importer (M-401): every row is checked before any write
+    { name: "deals", sampleCsv: dealsSampleCsv, importAll: importAdmissions },
   ];
 
   return resources.filter(({ name }) => name in definitions);

@@ -1,3 +1,4 @@
+import type { AdmissionImportReport } from "./useAdmissionImport";
 import type { ImportableResourceName } from "./useImportableResources";
 
 /**
@@ -27,5 +28,11 @@ export type ImportableResource = {
    * meaning there: a `02134` zipcode would otherwise be stored as `2134`.
    */
   textColumns?: string[];
-  processBatch: ProcessImportBatch;
+  /** Streams the file in batches, writing each batch as it goes. */
+  processBatch?: ProcessImportBatch;
+  /**
+   * Takes the whole file at once instead, so every row can be checked before
+   * anything is written; the dialog stays open and shows the report.
+   */
+  importAll?: (rows: ImportRow[]) => Promise<AdmissionImportReport>;
 };
