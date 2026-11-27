@@ -34,8 +34,8 @@ select is(
 );
 select matches(
   (select text from public.deal_notes where deal_id = -9201),
-  '^Fee paid: due 2026-12-01, next due 2027-01-01$',
-  'the note records the paid and the next due date'
+  '^Fee paid: ₹2500\.00, due 2026-12-01, next due 2027-01-01$',
+  'the note records the amount, the paid and the next due date'
 );
 select is(
   (select next_fee_due from public.deals where id = -9202),
