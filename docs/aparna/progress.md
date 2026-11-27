@@ -133,3 +133,7 @@ FINDINGS:
 ### 2026-11-24 — M1 Foundation (light mode)
 
 - [cuera/aparna-atomic-crm#3](https://github.com/cuera/aparna-atomic-crm/pull/3): Check green on `c38a058` (5 required jobs; pgTAP 5 files, 88 assertions in `e2e-test`). `passes: true`: M-101, M-102, M-103, M-104, M-106, M-108, M-109. M-105 passes (Owner confirmed 2026-11-25: red at the pgTAP step on `040d93d` https://github.com/cuera/aparna-atomic-crm/actions/runs/45434888103/job/138590456682, green after the revert `c38a058` https://github.com/cuera/aparna-atomic-crm/actions/runs/45435848670/job/138593963208). Awaiting the Owner: M-107 (Part A2/A3/A5 clicks; `administrator = true` for the first account only). Lost-column drag fails until M2's lost-reason prompt (S2, accepted).
+
+### 2026-11-27 — M3 Today and one-tap WhatsApp (light mode)
+
+- [cuera/aparna-atomic-crm#4](https://github.com/cuera/aparna-atomic-crm/pull/4): Check green on `305e29d` (5 required jobs; pgTAP 5 files, 88 assertions in `e2e-test`; first run red on `globalSearch.spec.ts`, P-33). `passes: true`: M-301, M-302, M-303, M-304, M-305, M-306. Schema reopened once with the Owner's approval: the fee-paid note carries the amount (P-32). Proposed ADR-A21 (Today opens admissions in place; phones cannot edit or archive). Awaiting the Owner: template wording (listed in the PR).
