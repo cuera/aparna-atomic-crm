@@ -442,7 +442,7 @@ export const englishCrmMessages = {
       latest_notes: "My Latest Notes",
       latest_notes_added_ago: "added %{timeAgo}",
       stepper: {
-        install: "Install Atomic CRM",
+        install: "Set up Aparna's English Coaching",
         progress: "%{step}/3 done",
         whats_next: "What's next?",
       },
