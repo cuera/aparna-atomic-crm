@@ -213,6 +213,12 @@ const ContactMiscInputs = () => {
       </h6>
       <TextInput source="background" multiline helperText={false} />
       <BooleanInput source="has_newsletter" helperText={false} />
+      <BooleanInput
+        source="whatsapp_opt_in"
+        label="WhatsApp messages allowed"
+        defaultValue={true}
+        helperText="Switch off when the parent asks not to get WhatsApp messages."
+      />
       <ReferenceInput
         reference="sales"
         source="sales_id"

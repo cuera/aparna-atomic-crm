@@ -269,6 +269,19 @@ const getDataProviderWithCustomMethods = () => {
 
       return data;
     },
+    // M-305: the only way "Mark fee paid" changes fees (compare-and-set, M-109).
+    // false = the shown due date is stale: someone already marked this fee.
+    async markFeePaid(dealId: Identifier, shownDue: string): Promise<boolean> {
+      const { data, error, status } = await getSupabaseClient().rpc(
+        "mark_fee_paid",
+        { p_deal_id: dealId, p_shown_due: shownDue },
+      );
+      if (error) {
+        console.error("mark_fee_paid.error", error);
+        throw new HttpError("Failed to mark the fee as paid", status, error);
+      }
+      return data === true;
+    },
     async getConfiguration(): Promise<ConfigurationContextValue> {
       const { data } = await baseDataProvider.getOne("configuration", {
         id: 1,

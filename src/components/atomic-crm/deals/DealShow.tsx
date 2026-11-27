@@ -19,12 +19,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate } from "../notes/NoteCreate";
 import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { MarkFeePaidButton } from "../today/MarkFeePaidButton";
 import type { Deal } from "../types";
+import { WhatsAppSend } from "../whatsapp/WhatsAppSend";
 import { ContactList } from "./ContactList";
 import {
   findDealLabel,
@@ -52,8 +55,10 @@ export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
   );
 };
 
-const DealShowContent = () => {
+export const DealShowContent = () => {
   const translate = useTranslate();
+  // Mobile has no admissions board, so its board actions (archive, edit) are hidden.
+  const isMobile = useIsMobile();
   const { dealStages, dealCategories, currency } = useConfigurationContext();
   const record = useRecordContext<Deal>();
   if (!record) return null;
@@ -64,7 +69,7 @@ const DealShowContent = () => {
       <div className="space-y-2">
         {record.archived_at ? <ArchivedTitle /> : null}
         <div className="flex-1">
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex flex-wrap gap-4 justify-between items-start mb-8">
             <div className="flex items-center gap-4">
               <ReferenceField
                 source="company_id"
@@ -75,22 +80,32 @@ const DealShowContent = () => {
               </ReferenceField>
               <h2 className="text-xl font-semibold">{record.name}</h2>
             </div>
-            <div className={`flex gap-2 ${record.archived_at ? "" : "pr-12"}`}>
+            <div
+              className={`flex flex-wrap items-start justify-end gap-2 ${record.archived_at ? "" : "pr-12"}`}
+            >
               {record.archived_at ? (
-                <>
-                  <UnarchiveButton record={record} />
-                  <DeleteButton />
-                </>
+                isMobile ? null : (
+                  <>
+                    <UnarchiveButton record={record} />
+                    <DeleteButton />
+                  </>
+                )
               ) : (
                 <>
-                  <ArchiveButton record={record} />
-                  <EditButton />
+                  <WhatsAppSend deal={record} />
+                  <MarkFeePaidButton deal={record} />
+                  {isMobile ? null : (
+                    <>
+                      <ArchiveButton record={record} />
+                      <EditButton />
+                    </>
+                  )}
                 </>
               )}
             </div>
           </div>
 
-          <div className="flex gap-8 m-4">
+          <div className="flex flex-wrap gap-8 m-4">
             <div className="flex flex-col mr-10">
               <span className="text-xs text-muted-foreground tracking-wide">
                 {translate("resources.deals.fields.expected_closing_date")}

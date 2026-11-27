@@ -252,7 +252,7 @@
         "Today replaces both the desktop and the mobile dashboard"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/TodayPage.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-302",
@@ -263,7 +263,7 @@
         "handles America/New_York and Europe/London daylight saving"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/misc/time.test.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-303",
@@ -275,7 +275,7 @@
         "wa.me URL uses E.164 digits and URL-encodes text"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp/templates.test.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-304",
@@ -289,7 +289,7 @@
         "the Parent form can switch whatsapp_opt_in off"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/whatsapp/WhatsAppSend.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-305",
@@ -302,7 +302,7 @@
         "the spec submits twice and asserts one period advance and one note"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/markFeePaid.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-306",
@@ -312,7 +312,7 @@
         "shows enquiries, median first-response time, trials, enrolled (from enrolled_at), lost by reason (from stage_changed_at) for the current week"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/ThisWeekStrip.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-401",

@@ -27,7 +27,9 @@ test.describe("global search", () => {
     await page.getByLabel("Email").fill("john@doe.com");
     await page.getByLabel("Password").fill("password");
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page.getByText("Latest Activity")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Today", level: 1 }),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await page
