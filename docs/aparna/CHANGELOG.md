@@ -11,6 +11,7 @@ Changed
 - The admissions board card shows the child's name and days in stage on one line, and only an overdue next action is red.
 - Buttons and fields are at least 44 px tall on a phone; the phone font size no longer scales up by 6%.
 - The sign-in page shows the brand name on a phone and a soft brand panel on a laptop; dialogs lose the background blur.
+- "Quick add enquiry" is the one filled (primary) button on Today and on the board; the phone top and bottom bars use the same white surface and hairline as the laptop header.
 
 ## 0.5.1-m5 — 2026-11-27 (M5 pilot fixes)
 
