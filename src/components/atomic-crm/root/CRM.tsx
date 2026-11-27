@@ -17,8 +17,6 @@ import { OAuthConsentPage } from "@/components/supabase/oauth-consent-page";
 
 import companies from "../companies";
 import contacts from "../contacts";
-import { Dashboard } from "../dashboard/Dashboard";
-import { MobileDashboard } from "../dashboard/MobileDashboard";
 import deals from "../deals";
 import { Layout } from "../layout/Layout";
 import { MobileLayout } from "../layout/MobileLayout";
@@ -55,6 +53,7 @@ import { i18nProvider as defaulti18nProvider } from "../providers/commons/i18nPr
 import { StartPage } from "../login/StartPage.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { MobileTasksList } from "../tasks/MobileTasksList.tsx";
+import { MobileTodayPage, TodayPage } from "../today/TodayPage";
 import { ContactListMobile } from "../contacts/ContactList.tsx";
 import { ContactShow } from "../contacts/ContactShow.tsx";
 import { CompanyShow } from "../companies/CompanyShow.tsx";
@@ -239,7 +238,7 @@ const DesktopAdmin = (
   return (
     <Admin
       layout={props.layout ?? Layout}
-      dashboard={props.dashboard ?? Dashboard}
+      dashboard={props.dashboard ?? TodayPage}
       {...props}
     >
       <CustomRoutes noLayout>
@@ -314,7 +313,7 @@ const MobileAdmin = (
       <Admin
         queryClient={queryClient}
         layout={props.layout ?? MobileLayout}
-        dashboard={props.dashboard ?? MobileDashboard}
+        dashboard={props.dashboard ?? MobileTodayPage}
         {...props}
       >
         <CustomRoutes noLayout>

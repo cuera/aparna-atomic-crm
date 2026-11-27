@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate } from "../notes/NoteCreate";
@@ -54,8 +55,10 @@ export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
   );
 };
 
-const DealShowContent = () => {
+export const DealShowContent = () => {
   const translate = useTranslate();
+  // Mobile has no admissions board, so its board actions (archive, edit) are hidden.
+  const isMobile = useIsMobile();
   const { dealStages, dealCategories, currency } = useConfigurationContext();
   const record = useRecordContext<Deal>();
   if (!record) return null;
@@ -81,16 +84,22 @@ const DealShowContent = () => {
               className={`flex flex-wrap items-start justify-end gap-2 ${record.archived_at ? "" : "pr-12"}`}
             >
               {record.archived_at ? (
-                <>
-                  <UnarchiveButton record={record} />
-                  <DeleteButton />
-                </>
+                isMobile ? null : (
+                  <>
+                    <UnarchiveButton record={record} />
+                    <DeleteButton />
+                  </>
+                )
               ) : (
                 <>
                   <WhatsAppSend deal={record} />
                   <MarkFeePaidButton deal={record} />
-                  <ArchiveButton record={record} />
-                  <EditButton />
+                  {isMobile ? null : (
+                    <>
+                      <ArchiveButton record={record} />
+                      <EditButton />
+                    </>
+                  )}
                 </>
               )}
             </div>
