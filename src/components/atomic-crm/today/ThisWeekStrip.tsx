@@ -10,9 +10,9 @@ interface ThisWeekStripProps {
 }
 
 const Stat = ({ label, value }: { label: string; value: string | number }) => (
-  <div className="flex flex-col">
+  <div className="flex flex-col gap-0.5">
     <span className="text-xs text-muted-foreground">{label}</span>
-    <span className="text-lg font-semibold">{value}</span>
+    <span className="text-xl font-semibold tabular-nums">{value}</span>
   </div>
 );
 
@@ -29,13 +29,15 @@ export const ThisWeekStrip = ({ deals, now }: ThisWeekStripProps) => {
     .join(", ");
 
   return (
-    <Card>
+    <Card className="gap-0 py-4 shadow-xs">
       <CardContent>
         <section
           aria-label="This week"
-          className="flex flex-wrap gap-x-8 gap-y-3"
+          className="grid grid-cols-3 gap-x-4 gap-y-4 sm:grid-cols-[repeat(5,auto)] sm:justify-start sm:gap-x-12"
         >
-          <h2 className="w-full text-sm font-semibold">This week</h2>
+          <h2 className="col-span-full text-sm font-medium text-muted-foreground">
+            This week
+          </h2>
           <Stat label="Enquiries" value={stats.enquiries} />
           <Stat
             label="Median first response"
@@ -47,9 +49,11 @@ export const ThisWeekStrip = ({ deals, now }: ThisWeekStripProps) => {
           />
           <Stat label="Trials" value={stats.trials} />
           <Stat label="Enrolled" value={stats.enrolled} />
-          <div className="flex flex-col">
+          <div className="col-span-2 flex flex-col gap-0.5 sm:col-span-1">
             <span className="text-xs text-muted-foreground">Lost</span>
-            <span className="text-lg font-semibold">{lostTotal}</span>
+            <span className="text-xl font-semibold tabular-nums">
+              {lostTotal}
+            </span>
             {lostDetail ? (
               <span className="text-xs text-muted-foreground">
                 {lostDetail}

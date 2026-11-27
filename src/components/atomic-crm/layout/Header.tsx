@@ -32,27 +32,29 @@ const Header = () => {
   return (
     <>
       <nav className="grow">
-        <header className="bg-secondary">
+        <header className="border-b bg-card">
           <div className="px-4">
-            <div className="flex justify-between items-center flex-1">
+            <div className="flex flex-1 items-center justify-between py-2">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-secondary-foreground no-underline"
+                className="flex items-center gap-2 text-foreground no-underline"
               >
-                <img
-                  className="[.light_&]:hidden h-6"
-                  src={darkModeLogo}
-                  alt={title}
-                />
-                <img
-                  className="[.dark_&]:hidden h-6"
-                  src={lightModeLogo}
-                  alt={title}
-                />
-                <h1 className="text-xl font-semibold">{title}</h1>
+                <span className="grid size-8 place-items-center rounded-lg bg-blush">
+                  <img
+                    className="[.light_&]:hidden h-5"
+                    src={darkModeLogo}
+                    alt={title}
+                  />
+                  <img
+                    className="[.dark_&]:hidden h-5"
+                    src={lightModeLogo}
+                    alt={title}
+                  />
+                </span>
+                <h1 className="text-base font-semibold">{title}</h1>
               </Link>
               <div>
-                <nav className="flex">
+                <nav className="flex gap-1">
                   <NavigationTab
                     label={translate("ra.page.dashboard")}
                     to="/"
@@ -110,10 +112,11 @@ const NavigationTab = ({
 }) => (
   <Link
     to={to}
-    className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+    aria-current={isActive ? "page" : undefined}
+    className={`rounded-md px-4 py-2 text-sm font-medium ${
       isActive
-        ? "text-secondary-foreground border-secondary-foreground"
-        : "text-secondary-foreground/70 border-transparent hover:text-secondary-foreground/80"
+        ? "bg-blush text-blush-foreground"
+        : "text-muted-foreground hover:bg-accent hover:text-foreground"
     }`}
   >
     {label}

@@ -76,7 +76,7 @@ export const QuickAddEnquiryButton = () => {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)}>
+      <Button onClick={() => setOpen(true)}>
         <Plus />
         Quick add enquiry
       </Button>
