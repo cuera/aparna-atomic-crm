@@ -141,3 +141,7 @@ FINDINGS:
 ### 2026-11-27 — M2 Capture and discipline (light mode)
 
 - [cuera/aparna-atomic-crm#5](https://github.com/cuera/aparna-atomic-crm/pull/5): Check green on `2017f17` (5 required jobs; `mvpBoardCard.spec.ts` in `e2e-test`, pgTAP 88 assertions). `passes: true`: M-201, M-202, M-203, M-204, M-205, M-206. P-34 (FakeRest assumed a company; guard added in M3's file with the Owner's approval). Merged main after M3 (#4).
+
+### 2026-11-27 — M4 Import and Today quick-add (light mode)
+
+- [cuera/aparna-atomic-crm#6](https://github.com/cuera/aparna-atomic-crm/pull/6): Check green on `7d882d7` (5 required jobs; M-401..M-403 specs in `🔎 Test`). `passes: true`: M-401, M-402, M-403. One admissions importer (the deals entry of the import dialog; `useDealImport.ts` unregistered, kept). Also in this PR, Owner-approved: the "Forgot password?" reset link now targets `/auth-callback.html` (P-35; production Redirect URLs must list it, and the Site URL must be that URL for invites and `update_password`). First `e2e-test` run red on a CI port collision (P-36), green on the next push.

@@ -1,3 +1,5 @@
-name,company,categories,stage,amount,expected_closing_date,description
-New website,Acme,"Website design, UI Design",Opportunity,12000,2026-09-30,Redesign of the public website
-Print campaign,Globex,Print project,Proposal Sent,4500,2026-10-15,
+parent_name,phone,country,child_name,grade,board,course,source,stage,next_follow_up,trial_at,note,fee_amount,fee_period,next_fee_due,lost_reason
+Asha Verma,+91 98765 00001,IN,Riya Verma,VI,CBSE,Grammar (IV-XII),WhatsApp,Enquiry,2026-12-02 11:00,,Asked about weekend batches,,,,
+Tom Baker,+44 7400 000001,GB,Lily Baker,IV,IGCSE,Spoken English,Website,Trial booked,,2026-12-03 18:30,,,,,
+Asha Verma,+91 98765 00001,IN,Kabir Verma,IX,CBSE,Board Exam Prep,Referral,Enrolled,,,Sibling of Riya,3000,monthly,2026-12-05,
+Neha Iyer,+91 98765 00002,IN,Arjun Iyer,VIII,ICSE,Creative Writing,Instagram,Lost,,,,,,,Price

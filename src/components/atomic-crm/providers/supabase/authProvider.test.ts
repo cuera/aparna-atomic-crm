@@ -2,14 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getAuthProvider } from "./authProvider";
 
-const { signOut, select } = vi.hoisted(() => ({
+const { signOut, select, resetPasswordForEmail } = vi.hoisted(() => ({
   signOut: vi.fn(),
   select: vi.fn(),
+  resetPasswordForEmail: vi.fn(),
 }));
 
 vi.mock("./supabase", () => ({
   getSupabaseClient: () => ({
-    auth: { signOut },
+    auth: { signOut, resetPasswordForEmail },
     from: () => ({ select }),
   }),
 }));
@@ -49,5 +50,35 @@ describe("Supabase session isolation", () => {
     });
 
     expect(signOut).toHaveBeenCalledExactlyOnceWith({ scope: "local" });
+  });
+});
+
+describe("Forgot password", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    resetPasswordForEmail.mockResolvedValue({ error: null });
+  });
+
+  it("sends the reset link to the auth-callback page, not the bare root", async () => {
+    // Arrange: the "Forgot password?" page sends only the email
+    const authProvider = getAuthProvider();
+
+    // Act
+    await authProvider.resetPassword({ email: "staff@example.com" });
+
+    // Assert: auth-callback.html forwards the token to #/auth-callback
+    expect(resetPasswordForEmail).toHaveBeenCalledExactlyOnceWith(
+      "staff@example.com",
+      { redirectTo: `${window.location.origin}/auth-callback.html` },
+    );
+  });
+
+  it("propagates the error Supabase returns", async () => {
+    const error = new Error("Email rate limit exceeded");
+    resetPasswordForEmail.mockResolvedValue({ error });
+
+    await expect(
+      getAuthProvider().resetPassword({ email: "staff@example.com" }),
+    ).rejects.toBe(error);
   });
 });

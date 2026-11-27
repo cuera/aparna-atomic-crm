@@ -326,7 +326,7 @@
         "sample CSV downloadable; tests use synthetic CSVs only; *.real.csv and imports/ are in .gitignore; real files are imported by a human in the production UI"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport/useAdmissionImport.test.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-402",
@@ -339,7 +339,7 @@
         "a fully valid file is imported in one go"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/dataImport/validateAdmissionRows.test.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-403",
@@ -350,7 +350,7 @@
         "it creates the same parent + admission as the board button"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/today/TodayQuickAdd.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-501",
