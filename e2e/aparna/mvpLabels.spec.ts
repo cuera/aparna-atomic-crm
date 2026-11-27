@@ -43,7 +43,8 @@ test.describe("MVP labels and menu", () => {
     await page.getByRole("link", { name: "Create admission" }).click();
 
     const form = page.getByRole("dialog").filter({ hasText: "Linked to" });
-    await form.getByRole("textbox", { name: "Name" }).fill("Asha");
+    // The admission name is hidden: it follows the child name
+    await form.getByRole("textbox", { name: "Child name" }).fill("Asha");
     // No company picked: the form must still save (company_id is optional)
     await expect(form.getByRole("combobox", { name: "Stage" })).toContainText(
       "Enquiry",

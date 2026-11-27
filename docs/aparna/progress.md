@@ -137,3 +137,7 @@ FINDINGS:
 ### 2026-11-27 — M3 Today and one-tap WhatsApp (light mode)
 
 - [cuera/aparna-atomic-crm#4](https://github.com/cuera/aparna-atomic-crm/pull/4): Check green on `305e29d` (5 required jobs; pgTAP 5 files, 88 assertions in `e2e-test`; first run red on `globalSearch.spec.ts`, P-33). `passes: true`: M-301, M-302, M-303, M-304, M-305, M-306. Schema reopened once with the Owner's approval: the fee-paid note carries the amount (P-32). ADR-A21 accepted for the pilot (Today opens admissions in place; phones cannot edit or archive; M5 pilot check: stage change on phone?). Templates approved for testing; final wording by the Owner before handover (`KICKOFF.md` Part F step 7).
+
+### 2026-11-27 — M2 Capture and discipline (light mode)
+
+- [cuera/aparna-atomic-crm#5](https://github.com/cuera/aparna-atomic-crm/pull/5): Check green on `2017f17` (5 required jobs; `mvpBoardCard.spec.ts` in `e2e-test`, pgTAP 88 assertions). `passes: true`: M-201, M-202, M-203, M-204, M-205, M-206. P-34 (FakeRest assumed a company; guard added in M3's file with the Owner's approval). Merged main after M3 (#4).

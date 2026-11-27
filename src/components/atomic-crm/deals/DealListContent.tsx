@@ -1,11 +1,33 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import isEqual from "lodash/isEqual";
-import { useDataProvider, useListContext, type DataProvider } from "ra-core";
+import pick from "lodash/pick";
+import {
+  Form,
+  useDataProvider,
+  useListContext,
+  useNotify,
+  type DataProvider,
+} from "ra-core";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { DealColumn } from "./DealColumn";
+import {
+  FeeInputs,
+  LostReasonInput,
+  NextActionInput,
+  TrialAtInput,
+  isOpenStage,
+} from "./DealInputs";
 import type { DealsByStage } from "./stages";
 import { getDealsByStage } from "./stages";
 
@@ -13,6 +35,8 @@ export const DealListContent = () => {
   const { dealStages } = useConfigurationContext();
   const { data: unorderedDeals, isPending, refetch } = useListContext<Deal>();
   const dataProvider = useDataProvider();
+  const notify = useNotify();
+  const [pendingMove, setPendingMove] = useState<PendingMove | null>(null);
 
   const [dealsByStage, setDealsByStage] = useState<DealsByStage>(
     getDealsByStage([], dealStages),
@@ -54,24 +78,60 @@ export const DealListContent = () => {
       index: undefined, // undefined if dropped after the last item
     };
 
+    const move: PendingMove = {
+      deal: sourceDeal,
+      source: { stage: sourceStage, index: source.index },
+      destination: { stage: destinationStage, index: destination.index },
+      destinationDeal,
+    };
+
+    // Some stages need data first (M-203, M-204, M-206): ask before moving the card
+    if (
+      sourceStage !== destinationStage &&
+      fieldsNeededToEnter(sourceDeal, destinationStage).length > 0
+    ) {
+      setPendingMove(move);
+      return;
+    }
+    applyMove(move, {});
+  };
+
+  const applyMove = (move: PendingMove, stageData: Partial<Deal>) => {
     // compute local state change synchronously
     setDealsByStage(
       updateDealStageLocal(
-        sourceDeal,
-        { stage: sourceStage, index: source.index },
-        { stage: destinationStage, index: destination.index },
+        move.deal,
+        move.source,
+        move.destination,
         dealsByStage,
       ),
     );
 
     // persist the changes
-    updateDealStage(sourceDeal, destinationDeal, dataProvider).then(() => {
-      refetch();
-    });
+    updateDealStage(move.deal, move.destinationDeal, dataProvider, stageData)
+      .catch((error: unknown) => {
+        notify(
+          error instanceof Error ? error.message : "ra.notification.http_error",
+          { type: "error" },
+        );
+      })
+      .finally(() => {
+        refetch();
+      });
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      {pendingMove && (
+        <StageDataDialog
+          move={pendingMove}
+          onCancel={() => setPendingMove(null)}
+          onConfirm={(stageData) => {
+            applyMove(pendingMove, stageData);
+            setPendingMove(null);
+          }}
+        />
+      )}
       <div className="flex gap-4">
         {dealStages.map((stage) => (
           <DealColumn
@@ -82,6 +142,76 @@ export const DealListContent = () => {
         ))}
       </div>
     </DragDropContext>
+  );
+};
+
+type PendingMove = {
+  deal: Deal;
+  source: { stage: string; index: number };
+  destination: { stage: string; index?: number };
+  destinationDeal: { stage: string; index?: number };
+};
+
+type StageField = "lost_reason" | "trial_at" | "fees" | "next_action_at";
+
+const FIELDS_BY_STAGE_FIELD: Record<StageField, (keyof Deal)[]> = {
+  lost_reason: ["lost_reason"],
+  trial_at: ["trial_at"],
+  fees: ["fee_amount_paise", "fee_period", "next_fee_due"],
+  next_action_at: ["next_action_at"],
+};
+
+/** What the board asks for before an admission enters a stage. */
+const fieldsNeededToEnter = (deal: Deal, stage: string): StageField[] => {
+  const fields: StageField[] = [];
+  if (stage === "lost") fields.push("lost_reason");
+  if (stage === "trial_booked") fields.push("trial_at");
+  if (stage === "enrolled") fields.push("fees");
+  if (isOpenStage(stage) && !deal.next_action_at) fields.push("next_action_at");
+  return fields;
+};
+
+const StageDataDialog = ({
+  move,
+  onCancel,
+  onConfirm,
+}: {
+  move: PendingMove;
+  onCancel: () => void;
+  onConfirm: (stageData: Partial<Deal>) => void;
+}) => {
+  const { dealStages } = useConfigurationContext();
+  const stage = move.destination.stage;
+  const fields = fieldsNeededToEnter(move.deal, stage);
+  const stageLabel = dealStages.find((s) => s.value === stage)?.label ?? stage;
+  const keys = fields.flatMap((field) => FIELDS_BY_STAGE_FIELD[field]);
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogTitle>Move to {stageLabel}</DialogTitle>
+        <DialogDescription>
+          {move.deal.child_name || move.deal.name}
+        </DialogDescription>
+        <Form
+          defaultValues={{ ...pick(move.deal, keys), stage }}
+          onSubmit={(values: Partial<Deal>) => onConfirm(pick(values, keys))}
+        >
+          <div className="flex flex-col gap-4">
+            {fields.includes("lost_reason") && <LostReasonInput />}
+            {fields.includes("trial_at") && <TrialAtInput />}
+            {fields.includes("fees") && <FeeInputs />}
+            {fields.includes("next_action_at") && <NextActionInput />}
+          </div>
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit">Move</Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -128,6 +258,7 @@ const updateDealStage = async (
     index?: number; // undefined if dropped after the last item
   },
   dataProvider: DataProvider,
+  stageData: Partial<Deal> = {},
 ) => {
   if (source.stage === destination.stage) {
     // moving deal inside the same column
@@ -235,6 +366,7 @@ const updateDealStage = async (
       dataProvider.update("deals", {
         id: source.id,
         data: {
+          ...stageData,
           index: destinationIndex,
           stage: destination.stage,
         },

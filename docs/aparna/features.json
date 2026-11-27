@@ -183,7 +183,7 @@
         "country guessed from the number"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/misc/phone.test.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-202",
@@ -197,7 +197,7 @@
         "the admission name is set to the child name (no name field)"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/contacts/QuickAddEnquiry.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-203",
@@ -209,7 +209,7 @@
         "moving from enrolled or lost back to an open stage without a next action asks for one"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/nextActionRequired.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-204",
@@ -217,7 +217,7 @@
       "title": "Lost reason",
       "acceptance": ["moving to Lost asks for a reason from the fixed list"],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/lostReason.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-205",
@@ -227,7 +227,7 @@
         "card shows child, course, next action (red when overdue), days in stage (from stage_changed_at)"
       ],
       "verify": "ci:e2e/aparna/mvpBoardCard.spec.ts",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-206",
@@ -239,7 +239,7 @@
         "the edit form shows child fields (child name, grade, board, course, source) and fee fields; the admission name field is hidden and set to the child name"
       ],
       "verify": "cmd:npx vitest run --project app src/components/atomic-crm/deals/stageDataEntry.test.tsx",
-      "passes": false
+      "passes": true
     },
     {
       "id": "M-301",
