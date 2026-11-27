@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { page } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
+
+import { buildCompany, buildContact } from "@/test/StoryWrapper";
 
 import {
   buildAdmission,
@@ -31,6 +33,39 @@ describe("Next action required (M-203)", () => {
     const offset = new Date(value).getTime() - Date.now();
     expect(offset).toBeGreaterThan(DAY_MS - 5 * 60 * 1000);
     expect(offset).toBeLessThanOrEqual(DAY_MS);
+  });
+
+  it("keeps what was typed when a parent is created from the new admission form", async () => {
+    // Arrange: the defaulted next action must not reset the form on re-render
+    const { screen, dataProvider } = await renderBoard({
+      companies: [buildCompany({ id: 1, name: "Smith Corp" })],
+      contacts: [buildContact({ id: 1, company_id: 1 })],
+    });
+    await screen.getByRole("link", { name: /new admission/i }).click();
+    const form = screen.getByRole("dialog");
+    await form.getByLabelText(/child name/i).fill("Big opportunity");
+
+    // Act: create a parent that is not on file yet, then save
+    const parents = form.getByPlaceholder("Search").first();
+    await parents.click();
+    await userEvent.type(parents, "Grace Hopper");
+    await screen.getByRole("option", { name: /Create Grace Hopper/ }).click();
+    const sheet = screen.getByRole("dialog", { name: /new parent/i });
+    await sheet.getByRole("button", { name: /^save$/i }).click();
+    await expect.element(form.getByText(/Grace Hopper/)).toBeVisible();
+    await form.getByRole("button", { name: /^save$/i }).click();
+
+    // Assert
+    await expect
+      .poll(async () => {
+        const { data } = await dataProvider.getList("deals", {
+          pagination: { page: 1, perPage: 10 },
+          sort: { field: "id", order: "ASC" },
+          filter: {},
+        });
+        return data.map((deal) => deal.child_name);
+      })
+      .toEqual(["Big opportunity"]);
   });
 
   it("cannot save an open admission without a next action", async () => {

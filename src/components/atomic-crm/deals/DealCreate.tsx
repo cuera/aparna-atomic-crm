@@ -10,6 +10,7 @@ import {
   type DataProvider,
   type GetListResult,
 } from "ra-core";
+import { useMemo } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 import { FormToolbar } from "../layout/FormToolbar";
@@ -81,6 +82,8 @@ export const DealCreate = ({ open }: { open: boolean }) => {
   };
 
   const { identity } = useGetIdentity();
+  // Fixed while the dialog is open: a new value on each render would reset the form
+  const nextActionDefault = useMemo(() => (open ? tomorrow() : null), [open]);
 
   return (
     <Dialog open={open} onOpenChange={() => handleClose()}>
@@ -96,7 +99,7 @@ export const DealCreate = ({ open }: { open: boolean }) => {
               sales_id: identity?.id,
               contact_ids: [],
               index: 0,
-              next_action_at: tomorrow(),
+              next_action_at: nextActionDefault,
             }}
           >
             <DealInputs />
