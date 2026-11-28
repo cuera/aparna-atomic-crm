@@ -5,7 +5,7 @@ import type {
   LayoutComponent,
 } from "ra-core";
 import { CustomRoutes, localStorageStore, Resource } from "ra-core";
-import { useEffect, useMemo } from "react";
+import { lazy, useEffect, useMemo } from "react";
 import { Route } from "react-router";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -18,6 +18,9 @@ import { OAuthConsentPage } from "@/components/supabase/oauth-consent-page";
 import companies from "../companies";
 import contacts from "../contacts";
 import deals from "../deals";
+
+// Lazy, like the desktop board, so it stays out of the main bundle
+const DealListMobile = lazy(() => import("../deals/DealListMobile"));
 import { Layout } from "../layout/Layout";
 import { MobileLayout } from "../layout/MobileLayout";
 import { SignupPage } from "../login/SignupPage";
@@ -345,6 +348,8 @@ const MobileAdmin = (
           <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
         </Resource>
         <Resource name="companies" show={CompanyShow} />
+        {/* ADR-A21 reversed: admissions on a phone, one stage at a time */}
+        <Resource name="deals" list={DealListMobile} />
         <Resource name="tasks" list={MobileTasksList} />
       </Admin>
     </PersistQueryClientProvider>

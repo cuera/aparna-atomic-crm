@@ -179,6 +179,7 @@ Status: Accepted for the pilot (human, 2026-11-27) · Date: 2026-11-27
 - Decision: A. One behaviour on both screens; the URL keeps the open admission; no change outside M3's files.
 - Consequences: on a phone an admission can be read, messaged and marked paid but not edited or archived until a mobile edit exists (M2/M5 decision). The old dashboard components stay in `dashboard/` unused.
 - Reversal condition: the pilot shows phone users need to edit admissions or change a stage (M5 pilot check, `KICKOFF.md` M5 step 2) → add the mobile `deals` resource and route Today rows to it.
+- Reversed in part (human, 2026-11-27): the phone gets an Admissions tab (mobile `deals` resource, `deals/DealListMobile.tsx`): one stage at a time from a row of stage chips with counts; a card opens the admission, which now shows Edit and Archive on a phone too, and the Edit form changes the stage with the same stage data as the board. Today rows still open the admission in place (option A), so both screens behave the same.
 
 ## Provenance & audit
 Sources: chat analysis 20–21 Nov 2026, upstream repo inspection, Meta and Razorpay docs.

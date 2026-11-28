@@ -81,7 +81,12 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
     await dismissToast("Element created");
   }
 
-  await expect(page.locator(isMobile ? "h2" : "h5")).toHaveText("Jane Smith");
+  // The new parent's page names them in a heading (h5 on desktop, h2 on mobile).
+  // By role and exact name: on mobile, Today's section headings are still on
+  // screen while the create sheet closes, and the header reads "Parent Jane Smith".
+  await expect(
+    page.getByRole("heading", { name: "Jane Smith", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("CEO at Smith Corp")).toBeVisible();
 
   // M3: with a first parent, the landing page is Today (the onboarding steps end here)

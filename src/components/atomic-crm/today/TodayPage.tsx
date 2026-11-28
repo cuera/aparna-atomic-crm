@@ -206,17 +206,6 @@ export const TodayPage = () => {
       </p>
     );
   }
-  // A brand-new CRM: the onboarding steps, under the same Quick add as a
-  // working day, so the first enquiry is captured with its admission (M5).
-  if (!totalContacts) {
-    return (
-      <div className="flex flex-col gap-4 mt-1">
-        <TodayHeader />
-        <DashboardStepper step={1} />
-      </div>
-    );
-  }
-
   const today = istDateKey(now);
   const courseLabel = (deal: Deal) =>
     courses?.find((course) => course.value === deal.course)?.label ??
@@ -225,6 +214,9 @@ export const TodayPage = () => {
   return (
     <div className="flex flex-col gap-4 mt-1">
       <TodayHeader />
+      {/* A brand-new CRM: the onboarding steps above the (empty) sections, so
+          the first enquiry lands where it will live (M5). */}
+      {!totalContacts ? <DashboardStepper step={1} /> : null}
       <ThisWeekStrip deals={deals} now={now} />
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <Section title="New" count={sections.newEnquiries.length}>
