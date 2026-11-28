@@ -68,6 +68,10 @@ const blockedReason = (
  * M-304: opens wa.me with a filled template in a new tab, then asks "Sent?" and
  * logs the note, the first response and the next follow-up.
  */
+/** The WhatsApp actions: a quiet green accent, so they are easy to spot in a list. */
+const WHATSAPP_BUTTON =
+  "flex items-center gap-2 h-9 border-transparent bg-whatsapp-tint text-whatsapp shadow-none hover:bg-[color-mix(in_oklch,var(--whatsapp-tint),var(--whatsapp)_8%)] hover:text-whatsapp aria-expanded:bg-[color-mix(in_oklch,var(--whatsapp-tint),var(--whatsapp)_8%)] aria-expanded:text-whatsapp";
+
 export const WhatsAppSend = ({
   deal,
   keys = TEMPLATE_KEYS,
@@ -194,7 +198,7 @@ export const WhatsAppSend = ({
         <Button
           size="sm"
           variant="outline"
-          className="flex items-center gap-2 h-9"
+          className={WHATSAPP_BUTTON}
           disabled={isDisabled}
           aria-describedby={reason ? reasonId : undefined}
           onClick={() => pick(keys[0])}
@@ -208,11 +212,7 @@ export const WhatsAppSend = ({
             disabled={isDisabled}
             aria-describedby={reason ? reasonId : undefined}
             render={
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex items-center gap-2 h-9"
-              />
+              <Button size="sm" variant="outline" className={WHATSAPP_BUTTON} />
             }
           >
             <MessageCircle className="w-4 h-4" />

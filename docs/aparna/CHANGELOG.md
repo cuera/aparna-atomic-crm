@@ -12,6 +12,7 @@ Changed
 
 - Today on a brand-new CRM shows its sections (empty, with "Nothing here.") under the setup steps, so it is clear where enquiries, follow-ups, trials and fees will appear.
 - The admission edit form fits a phone screen.
+- WhatsApp buttons have a quiet green accent (soft green with green text, 6.5:1 in light and 8.9:1 in dark), so they are easy to find in a list; the rest of the look is unchanged.
 
 ## 0.5.2-m5b — 2026-11-27 (M5b UI polish)
 
